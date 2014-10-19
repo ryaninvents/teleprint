@@ -1,0 +1,31 @@
+.sidebar {
+  background-color: #0c84e4;
+  color: white;
+  padding: 8px;
+  text-align: center;
+  font-size: 60px;
+  position: fixed;
+  top: -10px;
+  bottom: -10px;
+  left: 0;
+  width: 80px;
+  box-shadow: 3px 0 5px rgba(0,0,0,0.4);
+  line-height: 1.3em;
+}
+
+.sidebar i{
+  opacity: 0.5;
+}
+
+.sidebar i.active{
+  opacity: 1;
+}
+
+.main{
+  position: fixed;
+  top: 0;
+  left: 80px;
+  right: 0;
+  bottom: 0;
+  padding: 2px 8px;
+}
