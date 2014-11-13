@@ -17,6 +17,7 @@ app.use bodyParser.json()
 app.use bodyParser.urlencoded()
 app.use cookieParser()
 app.use express.static(path.join(__dirname, "public"))
+app.use express.static(path.join(__dirname, "bower_components"))
 app.use "/", routes
 app.use "/users", users
 
@@ -25,7 +26,6 @@ app.use (req, res, next) ->
   err = new Error("Not Found")
   err.status = 404
   next err
-  return
 
 
 #/ error handlers
@@ -39,8 +39,6 @@ if app.get("env") is "development"
       message: err.message
       error: err
 
-    return
-
 
 # production error handler
 # no stacktraces leaked to user
@@ -49,7 +47,5 @@ app.use (err, req, res, next) ->
   res.render "error",
     message: err.message
     error: {}
-
-  return
 
 module.exports = app
