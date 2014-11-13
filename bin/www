@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require('coffee-script/register');
 var debug = require('debug')('teleprint');
 var app = require('../app');
 
