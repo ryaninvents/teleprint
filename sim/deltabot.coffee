@@ -7,6 +7,19 @@ Sphere = require './sphere'
 
 sq = (x) -> x*x
 
+slope = (f, x, delta=0.001) -> (f(x+delta) - f(x))/delta
+
+newton = (f, opt={}) ->
+  initialGuess = opt.initialGuess or (throw new Error('Must pass initialGuess into opt'))
+  epsilon = opt.epsilon or 1e-6
+  y = initialGuess - f(initialGuess)/slope(f, initialGuess)
+  if Math.abs(y-initialGuess) < epsilon
+    y
+  else
+    newton f,
+      initialGuess: y
+      epsilon: epsilon
+
 module.exports =
 class DeltaBot
   constructor: (params) ->
@@ -43,3 +56,4 @@ class DeltaBot
       carriageZ = x[1]
       new Sphere r, tower.copy().add(new Vec(0,0,carriageZ))
     Sphere.trilaterate(spheres)
+  @newton: newton
