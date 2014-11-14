@@ -13,4 +13,4 @@ describe 'Sphere', ->
     intersections = Sphere.trilaterate [s1, s2, s3]
     [s1,s2,s3].forEach (sphere) ->
       intersections.forEach (intersection) ->
-        expect(new Vec().copy(intersection).distanceTo(sphere.center)).to.be.closeTo sphere.radius, 1e-5
+        expect(new Vec().copy(intersection).distanceTo(sphere.center)).to.be.closeTo sphere.radius, 1e-8
