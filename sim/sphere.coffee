@@ -1,6 +1,6 @@
 require 'sylvester'
 
-sq = (x) -> x*x
+{sq} = require './util'
 
 module.exports =
 class Sphere

@@ -3,7 +3,7 @@ require 'sylvester'
 
 Sphere = require './sphere'
 
-sq = (x) -> x*x
+{sq} = require './util'
 
 slope = (f, x, delta=0.001) -> (f(x+delta) - f(x))/delta
 
