@@ -1,6 +1,6 @@
 DeltaBot = require '../sim/deltabot'
 
-Vec = require('three').Vector3
+require 'sylvester'
 
 {expect} = require 'chai'
 
@@ -13,7 +13,7 @@ describe 'DeltaBot', ->
   it 'should offset tower locations by the carriage amount', ->
     expectedLength = @bot.bedRadius - @bot.platformOffset
     @bot.towerLocations(carriageAdjusted: yes).forEach (loc) =>
-      expect(new Vec().copy(loc).length()).to.be.closeTo expectedLength, 1e-8
+      expect(loc.modulus()).to.be.closeTo expectedLength, 1e-8
 
 describe 'Newtonian estimation', ->
   it 'should estimate sqrt(2)', ->

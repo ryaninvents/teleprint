@@ -1,7 +1,5 @@
-THREE = require 'three'
 _ = require 'lodash'
-
-Vec = THREE.Vector3
+require 'sylvester'
 
 Sphere = require './sphere'
 
@@ -35,17 +33,16 @@ class DeltaBot
     adjustment = if opt?.carriageAdjusted then @platformOffset else 0
     r = @bedRadius - adjustment
     [0..2].map (i) ->
-      v = new Vec()
       angle = 2*i*Math.PI/3
-      Vec.apply v, [Math.sin(angle), Math.cos(angle), 0].map (x) -> r*x
-      v
+      $V([Math.sin(angle), Math.cos(angle), 0].map (x) -> r*x)
   carriageHeights: (pos) ->
     ABC = @towerLocations(carriageAdjusted: yes)
+    console.log ABC
     W = pos
-    W_ = W.copy().setZ(0)
+    W_ = W.map (x, i) -> if i is 3 then 0 else x
     r = @armLength
     horizontalDistance = ABC.map (tower) ->
-      tower.copy().setZ(0).distanceTo W_
+      tower.map((x,i) -> if i is 3 then 0 else x).subtract(W_).modulus()
     horizontalDistance.map (dist) ->
       W.z + Math.sqrt sq(r) - sq(dist)
   printHeadLocation: (carriages) ->
@@ -54,6 +51,6 @@ class DeltaBot
     spheres = _.zip(towers, carriages).map (x) ->
       tower = x[0]
       carriageZ = x[1]
-      new Sphere r, tower.copy().add(new Vec(0,0,carriageZ))
+      new Sphere r, tower.add($V([0,0,carriageZ]))
     Sphere.trilaterate(spheres)
   @newton: newton
