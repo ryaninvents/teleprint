@@ -2,7 +2,6 @@ require 'sylvester'
 _ = require 'lodash'
 
 d = require './derivative'
-{getParamNames} = require './util'
 
 # Don't worry about performance on the first pass.
 # Worry about correctness.
