@@ -26,12 +26,9 @@ describe 'DeltaBot', ->
     err = @bot.heightErrorAtLocation bot2, $V [0, 85, 0]
     expect(_.isNumber err).to.be.ok()
 
-describe 'Newtonian estimation', ->
-  it 'should estimate sqrt(2)', ->
-    f = (x) -> x*x - 2
-    x = DeltaBot.newton(f, initialGuess: 10)
-    expect(x).to.be.closeTo Math.sqrt(2), 1e-6
-  it 'should solve sin(x)+log(x) = 2', ->
-    f = (x) -> Math.sin(x) + Math.log(x) - 2
-    x = DeltaBot.newton(f, initialGuess: 10)
-    expect(x).to.be.closeTo 9.70042510714, 1e-6
+  it "should optimize a printer's calibration", ->
+    console.log @bot.toString()
+    solution = @bot.solveGivenLocationAndHeightError
+      location: $V [0, 85, 0]
+      heightError: -1.905
+    console.log solution.toString()

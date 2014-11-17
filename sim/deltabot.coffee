@@ -7,16 +7,7 @@ Sphere = require './sphere'
 
 slope = (f, x, delta=0.001) -> (f(x+delta) - f(x))/delta
 
-newton = (f, opt={}) ->
-  initialGuess = opt.initialGuess or (throw new Error('Must pass initialGuess into opt'))
-  epsilon = opt.epsilon or 1e-6
-  y = initialGuess - f(initialGuess)/slope(f, initialGuess)
-  if Math.abs(y-initialGuess) < epsilon
-    y
-  else
-    newton f,
-      initialGuess: y
-      epsilon: epsilon
+newton = require './newton'
 
 module.exports =
 class DeltaBot
@@ -26,6 +17,7 @@ class DeltaBot
       @platformOffset
       @bedRadius
     } = params
+  toString: -> "DeltaBot(#{@armLength} arms/ #{@bedRadius} radius/ #{@platformOffset} offset)"
   towerLocations: (opt={})->
     # If we pass the carriageAdjusted option, then
     # move the towers inward so we can compute heights
@@ -93,4 +85,23 @@ class DeltaBot
 
     # Return the difference in Z.
     actualLocation.subtract(loc).e 3
-  @newton: newton
+
+  solveGivenLocationAndHeightError: (opt={}) ->
+    location = opt.location ? throw new Error 'need to pass a location'
+    heightError = opt.heightError ? throw new Error 'need to pass a heightError'
+    self = @
+    # can't bind within functions that get passed to the optimizer
+    f = (armLength, towerRadius) ->
+      testBot = new DeltaBot
+        armLength: armLength
+        platformOffset: 0
+        bedRadius: towerRadius
+      z = self.heightErrorAtLocation(testBot, location) - heightError
+      z*z
+    optimum = newton f,
+      initialGuess: [@armLength, @bedRadius - @platformOffset],
+      delta: (opt.delta ? .001)
+    new DeltaBot
+      armLength: optimum[0]
+      platformOffset: @platformOffset
+      bedRadius: optimum[1] - @platformOffset
