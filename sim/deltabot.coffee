@@ -98,7 +98,7 @@ class DeltaBot
         bedRadius: towerRadius
       z = self.heightErrorAtLocation(testBot, location) - heightError
       z*z
-    optimum = newton f,
+    optimum = newton.optimize f,
       initialGuess: [@armLength, @bedRadius - @platformOffset],
       delta: (opt.delta ? .001)
     new DeltaBot
