@@ -37,7 +37,7 @@ newton =
       delta = X_n.map -> delta
 
     # Stop after a certain number of iterations.
-    iterations = opt.maxIterations or 100
+    iterations = opt.iterations or 100
 
     # Adjusting for Wolfe's conditions; not currently used.
     gamma = opt.gamma or 1
@@ -58,12 +58,22 @@ newton =
       diff = vec2array X_n1.subtract(X_n)
 
       if opt?.debug
-        console.log "iteration #{iterations}:", X_n1, diff, f_of_X_n
+        console.log
+          iteration: iterations
+          X_n1: X_n1
+          diff: diff
+          f_of_X_n: f_of_X_n
+          f_prime_of_X_n: f_prime_of_X_n
+          gamma: gamma
+          delta: delta
+          epsilon: epsilon
 
       if (_.all diff, (x, i) -> Math.abs(x) < epsilon[i])
         break
 
       X_n = X_n1
+
+    if iterations <= 0 and opt?.debug then console.log 'ran out of runway'
 
     return vec2array X_n1
 

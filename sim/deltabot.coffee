@@ -44,6 +44,7 @@ class DeltaBot
       carriageZ = x[1]
       new Sphere r, tower.add($V([0,0,carriageZ]))
     Sphere.trilaterate(spheres)
+
   # Computes the height error at a given location.
   # The way this works is a little confusing; for example,
   # if you call
@@ -66,7 +67,7 @@ class DeltaBot
 
     # If we take these carriage heights and pass them into a printer with
     # slightly different dimensions, then we'll get a slightly different
-    # print head location.
+    # print head location. Here's where the print head actually ends up.
     actualLocation = estBot.printHeadLocation carriageHeights
 
     # If we've got multiple locations...
@@ -83,25 +84,33 @@ class DeltaBot
       # overconstrained and we want to return infinite error here.
       return Infinity
 
-    # Return the difference in Z.
-    actualLocation.subtract(loc).e 3
+    # Return the Z-coordinate.
+    actualLocation.e 3
 
   solveGivenLocationAndHeightError: (opt={}) ->
     location = opt.location ? throw new Error 'need to pass a location'
     heightError = opt.heightError ? throw new Error 'need to pass a heightError'
+    center = $V [0,0,0]
     self = @
-    # can't bind within functions that get passed to the optimizer
-    f = (armLength, towerRadius) ->
+
+    f = (armLength, towerRadius) =>
       testBot = new DeltaBot
         armLength: armLength
         platformOffset: 0
         bedRadius: towerRadius
-      z = self.heightErrorAtLocation(testBot, location) - heightError
-      z*z
-    optimum = newton.optimize f,
+      errorAtCenter = @heightErrorAtLocation testBot, center
+      z = @heightErrorAtLocation(testBot, location) - errorAtCenter - heightError
+      #console.log 'z', z, [armLength, towerRadius]
+      z
+    optimum = newton.findRoot f,
       initialGuess: [@armLength, @bedRadius - @platformOffset],
       delta: (opt.delta ? .001)
+      epsilon: (opt.epsilon ? 1e-5)
+      gamma: opt.gamma ? 1
+      debug: yes
+      iterations: opt.iterations
+    console.log "optimum", optimum
     new DeltaBot
       armLength: optimum[0]
       platformOffset: @platformOffset
-      bedRadius: optimum[1] - @platformOffset
+      bedRadius: optimum[1] + @platformOffset
