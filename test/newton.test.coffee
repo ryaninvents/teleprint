@@ -9,3 +9,11 @@ describe 'Newton optimization', ->
     expected = [10, 5]
     [0..1].forEach (i) ->
       expect(optimum[i]).to.be.closeTo expected[i], 1e-8
+describe 'Newton root finder', ->
+  it 'should be able to locate a root of a linear eqn', ->
+    f = (x, y) -> x - y
+    root = newton.findRoot f, initialGuess: [5,6]
+  it 'should be able to locate a root of a slightly more complex eqn', ->
+    f = (x, y) -> Math.sin(x) - Math.log(y)
+    root = newton.findRoot f, initialGuess: [0, 2], gamma: 0.1
+    expect(f.apply null, root).to.be.closeTo 0, 1e-3
