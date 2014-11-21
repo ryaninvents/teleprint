@@ -3,39 +3,34 @@ require 'sylvester'
 
 Sphere = require './sphere'
 
-{sq} = require './util'
+sq = (x) -> x*x
 
 slope = (f, x, delta=0.001) -> (f(x+delta) - f(x))/delta
 
 newton = require './newton'
+
+horizontalDistance = (A, B) ->
+  Math.sqrt Math.pow(A.e(1)-B.e(1), 2) + Math.pow(A.e(2)-B.e(2), 2)
 
 module.exports =
 class DeltaBot
   constructor: (params) ->
     {
       @armLength
-      @platformOffset
       @bedRadius
     } = params
-  toString: -> "DeltaBot(#{@armLength} arms/ #{@bedRadius} radius/ #{@platformOffset} offset)"
+  toString: -> "DeltaBot(#{@armLength} arms/ #{@bedRadius} radius)"
   towerLocations: (opt={})->
-    # If we pass the carriageAdjusted option, then
-    # move the towers inward so we can compute heights
-    # based on effective radius.
-    adjustment = if opt?.carriageAdjusted then @platformOffset else 0
-    r = @bedRadius - adjustment
+    r = @bedRadius
     [0..2].map (i) ->
       angle = 2*i*Math.PI/3
       $V([Math.sin(angle), Math.cos(angle), 0].map (x) -> r*x)
-  carriageHeights: (pos) ->
-    ABC = @towerLocations(carriageAdjusted: yes)
-    W = pos
-    W_ = W.map (x, i) -> if i is 3 then 0 else x
+  carriageHeights: (printHeadPosition) ->
+    towers = @towerLocations()
     r = @armLength
-    horizontalDistance = ABC.map (tower) ->
-      tower.map((x,i) -> if i is 3 then 0 else x).subtract(W_).modulus()
-    horizontalDistance.map (dist) ->
-      W.e(3) + Math.sqrt sq(r) - sq(dist)
+    horizontalDistances = towers.map (tower) -> horizontalDistance tower, printHeadPosition
+    horizontalDistances.map (d) ->
+      printHeadPosition.e(3) + Math.sqrt(sq(r) - sq(d))
   printHeadLocation: (carriages) ->
     towers = @towerLocations(carriageAdjusted: yes)
     r = @armLength
@@ -96,14 +91,13 @@ class DeltaBot
     f = (armLength, towerRadius) =>
       testBot = new DeltaBot
         armLength: armLength
-        platformOffset: 0
         bedRadius: towerRadius
       errorAtCenter = @heightErrorAtLocation testBot, center
       z = @heightErrorAtLocation(testBot, location) - errorAtCenter - heightError
       #console.log 'z', z, [armLength, towerRadius]
       z
     optimum = newton.findRoot f,
-      initialGuess: [@armLength, @bedRadius - @platformOffset],
+      initialGuess: [@armLength, @bedRadius],
       delta: (opt.delta ? .001)
       epsilon: (opt.epsilon ? 1e-5)
       gamma: opt.gamma ? 1
@@ -112,5 +106,4 @@ class DeltaBot
     console.log "optimum", optimum
     new DeltaBot
       armLength: optimum[0]
-      platformOffset: @platformOffset
-      bedRadius: optimum[1] + @platformOffset
+      bedRadius: optimum[1]

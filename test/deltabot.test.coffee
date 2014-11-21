@@ -10,17 +10,10 @@ describe 'DeltaBot', ->
   beforeEach ->
     @bot = new DeltaBot
       armLength: 250
-      platformOffset: 18+33
-      bedRadius: 175
+      bedRadius: 157
     @bot2 = new DeltaBot
-      armLength: 251
-      platformOffset: 18+33
-      bedRadius: 175
-
-  it 'should offset tower locations by the carriage amount', ->
-    expectedLength = @bot.bedRadius - @bot.platformOffset
-    @bot.towerLocations(carriageAdjusted: yes).forEach (loc) =>
-      expect(loc.modulus()).to.be.closeTo expectedLength, 1e-8
+      armLength: 249
+      bedRadius: 157
 
   it 'should give negligible height error when a bot is compared vs self', ->
     err = @bot.heightErrorAtLocation @bot, $V [0, 85, 0]
@@ -29,6 +22,17 @@ describe 'DeltaBot', ->
   it 'should compute height error at a given location', ->
     err = @bot.heightErrorAtLocation @bot2, $V [0, 85, 0]
     expect(_.isNumber err).to.be.ok()
+
+  it 'should compute carriage locations at an arm\'s length from print head', ->
+    testCarriageHeightsAt = (location) =>
+      ch = @bot.carriageHeights location
+      tl = @bot.towerLocations(carriageAdjusted: yes)
+      carriages = ch.map (c, i) ->
+        $V [tl[i].e(1), tl[i].e(2), c]
+      console.log carriages
+      carriages.forEach (carriage) =>
+        expect(carriage.subtract(location).modulus()).to.be.closeTo @bot.armLength, 1e-6
+    testCarriageHeightsAt $V [0,0,0]
 
   it 'should determine a perfectly-calibrated printer to be optimal', ->
     pt = $V [0, 85, 0]
@@ -57,8 +61,7 @@ describe 'DeltaBot', ->
     console.log recoveredBot.toString()
 
     expect(recoveredBot.armLength).to.be.closeTo @bot2.armLength, 1e-5
-    expect(recoveredBot.bedRadius - recoveredBot.platformOffset)
-    .to.be.closeTo @bot2.bedRadius - @bot2.platformOffset, 1e-5
+    expect(recoveredBot.bedRadius).to.be.closeTo @bot2.bedRadius, 1e-5
 
   it "should optimize a printer's calibration", ->
     console.log @bot.toString()
