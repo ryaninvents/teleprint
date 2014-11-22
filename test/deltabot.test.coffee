@@ -14,7 +14,7 @@ describe 'DeltaBot', ->
     @bot2 = new DeltaBot
       armLength: 249
       bedRadius: 157
-
+  return
   it 'should give negligible height error when a bot is compared vs self', ->
     err = @bot.heightErrorAtLocation @bot, $V [0, 85, 0]
     expect(err).to.be.closeTo 0, 1e-5

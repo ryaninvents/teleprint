@@ -23,6 +23,10 @@ describe 'Derivative', ->
       actual = d2f_dx2 x,y
       expected = 2
       expect(actual).to.be.closeTo expected, 1e-5
+  it 'should be able to find d(x => C).d(x) is 0', ->
+    f = (x) -> 5
+    df_dx = d(f).d('x')
+    expect(df_dx(0)).to.be.closeTo 0, 1e-6
   it 'should differentiate by x and then y', ->
     df_dx = d(@f).d(0, delta: .01)
     d2f_dx2 = d(df_dx, length:2).d(0, delta: .01)

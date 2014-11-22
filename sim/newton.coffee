@@ -5,11 +5,7 @@ H = require './hessian'
 d = require './derivative'
 del = require './del'
 
-vec2array = (vec) ->
-  return vec if _.isArray vec
-  out = []
-  vec.each (v) -> out.push v
-  out
+{vec2array} = require './util'
 
 # #Newton's methods
 module.exports =
