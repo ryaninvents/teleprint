@@ -1,44 +1,84 @@
 _ = require 'lodash'
 require 'sylvester'
 
+# We're using spheres to represent the deltabot arms. The center
+# of the sphere is at the carriage, and the radius of the sphere
+# is equal to the arm length. This way, the print head's location
+# is simply at the intersection of the three spheres.
 Sphere = require './sphere'
 
-sq = (x) -> x*x
-
-slope = (f, x, delta=0.001) -> (f(x+delta) - f(x))/delta
-
+# Newton approximation.
 newton = require './newton'
 
+# Utility squaring function
+sq = (x) -> x*x
+
+# Slope at a point. 
+# TODO: probably get rid of this since now there's `derivative.coffee`
+slope = (f, x, delta=0.001) -> (f(x+delta) - f(x))/delta
+
+
+# Project two 3D points onto a plane, and find the distance between them
+# without taking Z into account.
 horizontalDistance = (A, B) ->
   Math.sqrt Math.pow(A.e(1)-B.e(1), 2) + Math.pow(A.e(2)-B.e(2), 2)
 
 module.exports =
+# # DeltaBot
+
+# Represents a 3-tower, linear-actuator deltabot.
 class DeltaBot
   constructor: (params) ->
     {
       @armLength
       @bedRadius
     } = params
+
   toString: -> "DeltaBot(#{@armLength} arms/ #{@bedRadius} radius)"
+
+  # ## Tower locations
+
+  # Get a list of points, where each point represents the location
+  # of the base of a tower.
   towerLocations: (opt={})->
     r = @bedRadius
     [0..2].map (i) ->
       angle = 2*i*Math.PI/3
       $V([Math.sin(angle), Math.cos(angle), 0].map (x) -> r*x)
+
+  # ## Carriage heights
+
+  # Find carriage heights required for a given print head position.
   carriageHeights: (printHeadPosition) ->
     towers = @towerLocations()
     r = @armLength
     horizontalDistances = towers.map (tower) -> horizontalDistance tower, printHeadPosition
     horizontalDistances.map (d) ->
       printHeadPosition.e(3) + Math.sqrt(sq(r) - sq(d))
+
+  # ## Print Head Location
+
+  # Find possible print head positions for a given set of carriage
+  # heights. This will return an array of 0, 1, or 2 positions
+  # depending on how many possible solutions there are.
+  #
+  # `carriages` is an array of carriage heights.
   printHeadLocation: (carriages) ->
     towers = @towerLocations(carriageAdjusted: yes)
     r = @armLength
+
+    # Map the towers and carriage heights together to
+    # get a sphere modeling the possible endpoint positions
+    # of each arm.
     spheres = _.zip(towers, carriages).map (x) ->
-      tower = x[0]
-      carriageZ = x[1]
+      [tower, carriageZ] = x
       new Sphere r, tower.add($V([0,0,carriageZ]))
+
+    # Solve for the possible locations of the print head
+    # by intersecting the possible positions of the arms.
     Sphere.trilaterate(spheres)
+
+  # ## Height Error at Location
 
   # Computes the height error at a given location.
   # The way this works is a little confusing; for example,
@@ -79,9 +119,14 @@ class DeltaBot
       # overconstrained and we want to return infinite error here.
       return Infinity
 
-    # Return the Z-coordinate.
-    actualLocation.e 3
+    # Return the Z-difference.
+    actualLocation.e(3) - loc.e(3)
 
+  # ## Solve given location and height error
+
+  # This will attempt to "solve" a deltabot, given a print head location
+  # and height error at that location. This is currently super-broken
+  # beyond all human comprehension.
   solveGivenLocationAndHeightError: (opt={}) ->
     location = opt.location ? throw new Error 'need to pass a location'
     heightError = opt.heightError ? throw new Error 'need to pass a heightError'
