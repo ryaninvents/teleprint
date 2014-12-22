@@ -164,9 +164,7 @@ class DeltaBot
       delta: (opt.delta ? .001)
       epsilon: (opt.epsilon ? 1e-5)
       gamma: opt.gamma ? 1
-      debug: yes
       iterations: opt.iterations
-    console.log "optimum", optimum
     new DeltaBot
       armLength: optimum[0]
       bedRadius: optimum[1]

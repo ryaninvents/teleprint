@@ -31,7 +31,6 @@ describe 'DeltaBot', ->
       tl = @bot.towerLocations(carriageAdjusted: yes)
       carriages = ch.map (c, i) ->
         $V [tl[i].e(1), tl[i].e(2), c]
-      console.log carriages
       carriages.forEach (carriage) =>
         expect(carriage.subtract(location).modulus()).to.be.closeTo @bot.armLength, 1e-6
     testCarriageHeightsAt $V [0,0,0]
@@ -64,10 +63,15 @@ describe 'DeltaBot', ->
       epsilon: 1e-4
       gamma: 0.1
       iterations: 1e4
-      delta: 1
+      delta: 0.01
 
-    console.log @bot2.toString()
-    console.log recoveredBot.toString()
-
-    expect(recoveredBot.armLength).to.be.closeTo(@bot2.armLength, 1e-5)
-    expect(recoveredBot.bedRadius).to.be.closeTo(@bot2.bedRadius, 1e-5)
+    [0..10].forEach =>
+      pt = $V [
+        Math.random()*100-50
+        Math.random()*100-50
+        0
+      ]
+      err = @bot2.amountOutOfPlaneAtLocation recoveredBot, pt
+      expect(err).to.be.closeTo 0, 0.2
+    #expect(recoveredBot.armLength).to.be.closeTo(@bot2.armLength, 1e-5)
+    #expect(recoveredBot.bedRadius).to.be.closeTo(@bot2.bedRadius, 1e-5)
