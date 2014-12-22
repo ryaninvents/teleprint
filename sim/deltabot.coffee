@@ -13,7 +13,7 @@ newton = require './newton'
 # Utility squaring function
 sq = (x) -> x*x
 
-# Slope at a point. 
+# Slope at a point.
 # TODO: probably get rid of this since now there's `derivative.coffee`
 slope = (f, x, delta=0.001) -> (f(x+delta) - f(x))/delta
 
@@ -34,7 +34,7 @@ class DeltaBot
       @bedRadius
     } = params
 
-  toString: -> "DeltaBot(#{@armLength} arms/ #{@bedRadius} radius)"
+  toString: -> "DeltaBot(#{@armLength}mm arms/ #{@bedRadius}mm radius)"
 
   # ## Tower locations
 
@@ -56,7 +56,7 @@ class DeltaBot
     horizontalDistances.map (d) ->
       printHeadPosition.e(3) + Math.sqrt(sq(r) - sq(d))
 
-  # ## Print Head Location
+  # ## Print head location
 
   # Find possible print head positions for a given set of carriage
   # heights. This will return an array of 0, 1, or 2 positions
@@ -78,7 +78,7 @@ class DeltaBot
     # by intersecting the possible positions of the arms.
     Sphere.trilaterate(spheres)
 
-  # ## Height Error at Location
+  # ## Height error at location
 
   # Computes the height error at a given location.
   # The way this works is a little confusing; for example,
@@ -122,25 +122,43 @@ class DeltaBot
     # Return the Z-difference.
     actualLocation.e(3) - loc.e(3)
 
-  # ## Solve given location and height error
+  # ## Amount out-of-plane at location
 
-  # This will attempt to "solve" a deltabot, given a print head location
-  # and height error at that location. This is currently super-broken
-  # beyond all human comprehension.
-  solveGivenLocationAndHeightError: (opt={}) ->
-    location = opt.location ? throw new Error 'need to pass a location'
-    heightError = opt.heightError ? throw new Error 'need to pass a heightError'
-    center = $V [0,0,0]
-    self = @
+  # Figures out how far out-of-plane the print head movement is
+  # at a particular location compared to center. In other words,
+  # if you told the bot to move from the center to `loc` while
+  # keeping constant Z, this function would figure out the actual
+  # difference in Z.
+  #
+  # If this value is positive, then the print head moves in a
+  # "bowl" shape; if negative, then the print head moves in
+  # a "dome" shape.
+  amountOutOfPlaneAtLocation: (estBot, loc) ->
+    errorAtCenter = @heightErrorAtLocation estBot, $V [0,0,0]
+    errorAtLoc = @heightErrorAtLocation estBot, loc
+    errorAtLoc - errorAtCenter
 
+  # ## Solve given locations and height errors
+
+  # This will attempt to "solve" a deltabot, given an array of print head locations and
+  # their associated errors; e.g. `[ [point, error], [point2, error2], ...]`.
+  solveGivenLocationsAndHeightErrors: (locErrorPairs, opt={}) ->
+
+    # Here's the function we're going to optimize on.
     f = (armLength, towerRadius) =>
+
+      # Create a candidate DeltaBot.
       testBot = new DeltaBot
         armLength: armLength
         bedRadius: towerRadius
-      errorAtCenter = @heightErrorAtLocation testBot, center
-      z = @heightErrorAtLocation(testBot, location) - errorAtCenter - heightError
-      #console.log 'z', z, [armLength, towerRadius]
-      z
+
+      # For each test point and associated error...
+      locErrorPairs.reduce (sum, pair) =>
+        [point, err] = pair
+        # ...add the difference between (the amount this point is
+        # out-of-plane) and (the measured error at this point)
+        sum + @amountOutOfPlaneAtLocation(testBot, point) - err
+      , 0
     optimum = newton.findRoot f,
       initialGuess: [@armLength, @bedRadius],
       delta: (opt.delta ? .001)

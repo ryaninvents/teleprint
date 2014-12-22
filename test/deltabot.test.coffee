@@ -8,13 +8,15 @@ _ = require 'lodash'
 describe 'DeltaBot', ->
 
   beforeEach ->
+    # Our "ideal" DeltaBot.
     @bot = new DeltaBot
       armLength: 250
       bedRadius: 157
+    # Our "actual" DeltaBot.
     @bot2 = new DeltaBot
       armLength: 249
       bedRadius: 157
-  return
+
   it 'should give negligible height error when a bot is compared vs self', ->
     err = @bot.heightErrorAtLocation @bot, $V [0, 85, 0]
     expect(err).to.be.closeTo 0, 1e-5
@@ -34,6 +36,7 @@ describe 'DeltaBot', ->
         expect(carriage.subtract(location).modulus()).to.be.closeTo @bot.armLength, 1e-6
     testCarriageHeightsAt $V [0,0,0]
 
+  ###
   it 'should determine a perfectly-calibrated printer to be optimal', ->
     pt = $V [0, 85, 0]
     recoveredBot = @bot.solveGivenLocationAndHeightError
@@ -46,27 +49,25 @@ describe 'DeltaBot', ->
 
     expect(recoveredBot.armLength).to.be.closeTo @bot.armLength, 1e-5
     expect(recoveredBot.bedRadius).to.be.closeTo @bot.bedRadius, 1e-5
+  ###
 
   it 'should recover a slightly-off printer calibration', ->
-    pt = $V [0, 85, 0]
-    err = @bot.heightErrorAtLocation @bot2, pt
-    recoveredBot = @bot.solveGivenLocationAndHeightError
-      location: pt
-      heightError: err
-      epsilon: 1e-5
+    pts = [0...6].map (n) ->
+      $V [
+        85*Math.cos(Math.PI*n/3)
+        85*Math.sin(Math.PI*n/3)
+        0
+      ]
+    pts = pts.map (pt) => [pt, @bot2.amountOutOfPlaneAtLocation(@bot, pt)]
+
+    recoveredBot = @bot.solveGivenLocationsAndHeightErrors pts,
+      epsilon: 1e-4
       gamma: 0.1
       iterations: 1e4
+      delta: 1
 
     console.log @bot2.toString()
     console.log recoveredBot.toString()
 
-    expect(recoveredBot.armLength).to.be.closeTo @bot2.armLength, 1e-5
-    expect(recoveredBot.bedRadius).to.be.closeTo @bot2.bedRadius, 1e-5
-
-  it "should optimize a printer's calibration", ->
-    console.log @bot.toString()
-    solution = @bot.solveGivenLocationAndHeightError
-      location: $V [0, 85, 0]
-      heightError: 0
-      gamma: 1
-    console.log solution.toString()
+    expect(recoveredBot.armLength).to.be.closeTo(@bot2.armLength, 1e-5)
+    expect(recoveredBot.bedRadius).to.be.closeTo(@bot2.bedRadius, 1e-5)

@@ -7,8 +7,8 @@ describe 'Newton optimization', ->
     f = (x, y) -> (x-10)*(x-10) + (y-5)*(y-5)
     optimum = newton.optimize(f, initialGuess: [0.1,0.1], delta: .01)
     expected = [10, 5]
-    [0..1].forEach (i) ->
-      expect(optimum[i]).to.be.closeTo expected[i], 1e-8
+    expected.forEach (expected, i) ->
+      expect(optimum[i]).to.be.closeTo expected, 1e-8
 describe 'Newton root finder', ->
   it 'should be able to locate a root of a linear eqn', ->
     f = (x, y) -> x - y
