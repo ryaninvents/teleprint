@@ -1,10 +1,19 @@
 extends layout
 
 block content
-  .sidebar
-    i.fa.fa-tachometer.active
-    i.fa.fa-cube
-    i.fa.fa-cogs
+  .red.left.labeled.icon.vertical.ui.fixed.pointing.menu
+    a.active.item
+      i.fa.fa-tachometer.icon
+      | Machine
+    a.item
+      i.fa.fa-cube.icon
+      | Model
+    a.item
+      i.fa.fa-cogs.icon
+      | Settings
   .main
     p IP Address: #{ip}
+  script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js")
+  script(src="/socket.io.js")
+  script(src='/js/main.js')
 

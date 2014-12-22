@@ -1,0 +1,19 @@
+h2 Not connected
+p Choose a port and baudrate to connect.
+
+.ui.grid
+  .row
+    .eight.wide.column
+      h4 Port
+      .ui.fluid.vertical.menu
+        a.item /dev/ttyUSB0
+    .eight.wide.column
+      h4 Baudrate
+      .ui.form
+        .field
+          input(type="number", value="9600")
+  .row
+    .sixteen.wide.column
+      .two.big.ui.buttons
+        a.blue.ui.button Refresh
+        a.positive.fluid.ui.button Connect

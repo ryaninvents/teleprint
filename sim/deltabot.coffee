@@ -142,6 +142,11 @@ class DeltaBot
 
   # This will attempt to "solve" a deltabot, given an array of print head locations and
   # their associated errors; e.g. `[ [point, error], [point2, error2], ...]`.
+  #
+  # Options:
+  # * `delta`: distance in domain to use for taking slope
+  # * `epsilon`: smallest change in output we care about; if the error is
+  #   smaller than this amount then we'll stop iterating
   solveGivenLocationsAndHeightErrors: (locErrorPairs, opt={}) ->
 
     # Here's the function we're going to optimize on.

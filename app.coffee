@@ -5,7 +5,8 @@ logger = require("morgan")
 cookieParser = require("cookie-parser")
 bodyParser = require("body-parser")
 routes = require("./routes/index")
-users = require("./routes/users")
+browserify = require 'browserify-middleware'
+api = require './routes/api'
 app = express()
 
 # view engine setup
@@ -16,10 +17,16 @@ app.use logger("dev")
 app.use bodyParser.json()
 app.use bodyParser.urlencoded()
 app.use cookieParser()
+
+coffeeify = require 'coffeeify'
+jadeify = require 'jadeify'
+browserify.settings 'transform', [coffeeify, jadeify]
+app.use '/js/main.js', browserify './public/js/main.coffee'
+
 app.use express.static(path.join(__dirname, "public"))
 app.use express.static(path.join(__dirname, "bower_components"))
 app.use "/", routes
-app.use "/users", users
+app.use '/api', api
 
 #/ catch 404 and forward to error handler
 app.use (req, res, next) ->
@@ -48,4 +55,7 @@ app.use (err, req, res, next) ->
     message: err.message
     error: {}
 
-module.exports = app
+module.exports = (port, callback) ->
+  server = require('http').Server(app)
+  require('./routes/socket')(server)
+  server.listen port, => console.log "Listening on #{port}"
