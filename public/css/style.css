@@ -20,3 +20,11 @@ h6:first-child
 {
   margin-top: 0;
 }
+
+input[type="file"] {
+  display: none;
+}
+
+a.item {
+  text-overflow: ellipsis;
+}

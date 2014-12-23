@@ -12,5 +12,15 @@ Router = Backbone.Router.extend
   machine: ->
     view = new NotConnectedView()
     $('.main').html(view.render().$el)
-  model: -> console.log 'model route!'
-  settings: -> console.log 'settings route, oooo'
+    $('#side-menu > .item').removeClass('active')
+    $('#machine').addClass('active')
+  model: ->
+    $('.main').html('<input type="file" id="file-select"/><a class="ui button">Pick file</a>')
+    $('.main a.button').click =>
+      $('#file-select').click()
+    $('#side-menu > .item').removeClass('active')
+    $('#model').addClass('active')
+  settings: ->
+    $('.main').html('')
+    $('#side-menu > .item').removeClass('active')
+    $('#settings').addClass('active')

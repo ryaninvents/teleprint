@@ -1,19 +1,14 @@
 h2 Not connected
-p Choose a port and baudrate to connect.
+p Choose a machine to connect to.
 
-.ui.grid
-  .row
-    .eight.wide.column
-      h4 Port
-      .ui.fluid.vertical.menu
-        a.item /dev/ttyUSB0
-    .eight.wide.column
-      h4 Baudrate
-      .ui.form
-        .field
-          input(type="number", value="9600")
-  .row
-    .sixteen.wide.column
-      .two.big.ui.buttons
-        a.blue.ui.button Refresh
-        a.positive.fluid.ui.button Connect
+.ui.cards
+  .card
+    a.image(href='#', style="min-height:130px;color:rgba(0,0,0,0.7);vertical-align:middle;text-align:center;")
+      i.fa.fa-cube(style="font-size: 80px;padding-top:0.2em;")
+    .content
+      a: i.right.floated.icon.fa.fa-pencil
+      .header Unknown machine on /dev/ttyUSB0
+      .meta 115200 baudrate
+    .ui.bottom.attached.green.button
+      i.fa.fa-plus
+      | #{' '}Connect

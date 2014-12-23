@@ -1,14 +1,14 @@
 extends layout
 
 block content
-  .red.left.labeled.icon.vertical.ui.fixed.pointing.menu
-    a.active.item
+  .red.left.labeled.icon.vertical.ui.fixed.pointing.menu#side-menu
+    a.item(href='#')#machine
       i.fa.fa-tachometer.icon
       | Machine
-    a.item
+    a.item(href='#model')#model
       i.fa.fa-cube.icon
       | Model
-    a.item
+    a.item(href='#settings')#settings
       i.fa.fa-cogs.icon
       | Settings
   .main
@@ -16,4 +16,3 @@ block content
   script(src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js")
   script(src="/socket.io.js")
   script(src='/js/main.js')
-

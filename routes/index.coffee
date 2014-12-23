@@ -9,8 +9,8 @@ ip = _.flatten(_.values(require("os").networkInterfaces())).filter((iface) ->
 )[0]
 console.log ip
 
-# GET home page. 
-router.get "/", (req, res) ->
+# GET home page.
+router.get /^\/(model|settings)?$/, (req, res) ->
   res.render "index",
     ip: ip
 
