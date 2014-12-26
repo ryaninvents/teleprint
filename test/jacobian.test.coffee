@@ -1,4 +1,4 @@
-J = require '../sim/jacobian'
+J = require '../math/jacobian'
 
 {expect} = require 'chai'
 

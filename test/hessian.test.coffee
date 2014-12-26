@@ -1,8 +1,8 @@
 require 'sylvester'
 _ = require 'lodash'
 
-H = require '../sim/hessian'
-d = require '../sim/derivative'
+H = require '../math/hessian'
+d = require '../math/derivative'
 
 {expect} = require 'chai'
 

@@ -3,12 +3,9 @@ p Choose a machine to connect to.
 
 .ui.cards
   .card
-    a.image(href='#', style="min-height:130px;color:rgba(0,0,0,0.7);vertical-align:middle;text-align:center;")
-      i.fa.fa-cube(style="font-size: 80px;padding-top:0.2em;")
+    a.image(href='#', style="height:12rem;color:rgba(0,0,0,0.7);vertical-align:middle;text-align:center;")
+      i.fa.fa-print(style="font-size: 8rem;padding-top:1.75rem;")
     .content
-      a: i.right.floated.icon.fa.fa-pencil
+      a(data-action="edit"): i.right.floated.icon.fa.fa-wrench
       .header Unknown machine on /dev/ttyUSB0
       .meta 115200 baudrate
-    .ui.bottom.attached.green.button
-      i.fa.fa-plus
-      | #{' '}Connect

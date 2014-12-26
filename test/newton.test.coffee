@@ -1,4 +1,4 @@
-newton = require '../sim/newton'
+newton = require '../math/newton'
 
 {expect} = require 'chai'
 

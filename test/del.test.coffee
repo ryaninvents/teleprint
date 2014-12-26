@@ -1,4 +1,4 @@
-del = require '../sim/del'
+del = require '../math/del'
 
 {expect} = require 'chai'
 

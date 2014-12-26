@@ -10,8 +10,8 @@ Router = Backbone.Router.extend
     "model": "model"
     "settings": "settings"
   machine: ->
-    view = new NotConnectedView()
-    $('.main').html(view.render().$el)
+    @view ?= new NotConnectedView()
+    $('.main').html(@view.render().$el)
     $('#side-menu > .item').removeClass('active')
     $('#machine').addClass('active')
   model: ->
@@ -21,6 +21,9 @@ Router = Backbone.Router.extend
     $('#side-menu > .item').removeClass('active')
     $('#model').addClass('active')
   settings: ->
-    $('.main').html('')
+    $('.main').html('<a class="ui red button">Refresh</a>')
+    $('.main a.button').click =>
+      $(this).text 'Reloading...'
+      document.location.reload()
     $('#side-menu > .item').removeClass('active')
     $('#settings').addClass('active')

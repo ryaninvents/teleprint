@@ -1,4 +1,4 @@
-Sphere = require '../sim/sphere'
+Sphere = require '../math/sphere'
 
 require 'sylvester'
 

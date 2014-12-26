@@ -1,4 +1,4 @@
-d = require '../sim/derivative'
+d = require '../math/derivative'
 
 {expect} = require 'chai'
 

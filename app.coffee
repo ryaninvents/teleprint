@@ -7,6 +7,7 @@ bodyParser = require("body-parser")
 routes = require("./routes/index")
 browserify = require 'browserify-middleware'
 api = require './routes/api'
+opts = require './options'
 app = express()
 
 # view engine setup
@@ -55,7 +56,8 @@ app.use (err, req, res, next) ->
     message: err.message
     error: {}
 
-module.exports = (port, callback) ->
+module.exports = (callback) ->
+  port = opts.port
   server = require('http').Server(app)
   require('./routes/socket')(server)
   server.listen port, => console.log "Listening on #{port}"

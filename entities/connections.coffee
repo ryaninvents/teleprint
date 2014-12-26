@@ -1,15 +1,16 @@
 {SerialPort} = require 'serialport'
 Bacon = require 'baconjs'
+uuid = require 'node-uuid'
 
 _ = require 'lodash'
 
 connections = []
 
-lastId = 1
-
-id = -> lastId++
+id = -> uuid.v4()
 
 connectionStream = new Bacon.Bus()
+
+ports = require './ports'
 
 process.on 'exit', ->
   console.log "Closing ports..."
@@ -25,17 +26,15 @@ module.exports =
   any: (f) -> _.any connections, f
   get: (id) -> _.findWhere connections, (cx) -> (""+cx.info.id) is ""+id
   add: (data, callback) ->
-    {comName, baudRate} = data
-    baudRate ?= 9600
-    port = new SerialPort comName, baudRate: baudRate, (err) ->
-      if err then return callback err
-      port.info =
-        id: id()
-        comName: comName
-        baudRate: baudRate
-        opened: +new Date()
-      connections.push port
-      connectionStream.push port
-      callback null, port
+    {type} = data
+    if ports[type]?
+      ports[type] data, (err, port) ->
+        if err then return callback err
+        connections.push port
+        connectionStream.push port
+        callback null, port
+    else
+      callback new Error "No port type specified"
+
   connectionEvents: ->
     connectionStream.map _.identity

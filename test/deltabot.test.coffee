@@ -1,4 +1,4 @@
-DeltaBot = require '../sim/deltabot'
+DeltaBot = require '../math/deltabot'
 
 require 'sylvester'
 
