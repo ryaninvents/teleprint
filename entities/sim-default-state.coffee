@@ -1,47 +1,52 @@
 module.exports =
   # Position.
-  x: 0
-  y: 0
-  z: 0
-  e: 0
+  X: 0
+  Y: 0
+  Z: 0
+  E: 0
   # Feedrate for travel and extrusion.
-  rapidMoveRate:      1000
-  controlledMoveRate: 1000
+  F: 1000
   # Temperatures of nozzle and heated bed.
   nozzleTemp: 20
   bedTemp: 20
   # Check whether we've homed since the last reset.
   homed:
-    x: no
-    y: no
-    z: no
+    X: no
+    Y: no
+    Z: no
   # Units of measurement.
   units: 'mm'
   # `absolute` or `relative` positioning
   positioning: 'absolute'
   # Which motors are powered on?
   motorPower:
-    x: yes
-    y: yes
-    z: yes
-    e: yes
+    X: off
+    Y: off
+    Z: off
+    E: off
   stepsPerUnit: 20
   # Goal temperatures to reach.
   targetNozzleTemp: 20
   targetBedTemp: 20
   # Endstop statuses.
   endstops:
-    x:
-      min: on
+    X:
+      min: off
       max: on
-    y:
-      min: on
+    Y:
+      min: off
       max: on
-    z:
-      min: on
+    Z:
+      min: off
       max: on
   # Delta calibration
   deltaParams:
     diagonalRod: 250
     deltaRadius: 160
     segmentsPerSecond: 200
+    endstopOffsets:
+      X: 0
+      Y: 0
+      Z: 0
+  # Line number, to make sure we're not skipping code
+  lineNumber: 0
