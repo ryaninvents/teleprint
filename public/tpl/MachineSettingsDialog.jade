@@ -1,8 +1,22 @@
 .header Machine settings
 .content
-  .ui.medium.image: i.fa.fa-cube
-  .description
-    | Unknown printer attached to /dev/ttyUSB0
+  .ui.medium.image(style="height:12rem;background-color:rgba(0,0,0,0.05);color:rgba(0,0,0,0.7);vertical-align:middle;text-align:center;")
+    i.fa.fa-cogs(style="font-size:8rem;padding-top:2rem;padding-bottom:2rem;")
+    div(style="position:absolute;top:4px;right:0;")
+      a.red.circular.ui.icon.button(title="Delete picture")
+        i.fa.fa-trash
+      a.purple.circular.ui.icon.button(title="Change picture")
+        i.fa.fa-pencil
+  .description: .ui.form
+    .field
+      label Machine name
+      .field(data-field="name")
+        input(value=machine.get('name'))
+    .field
+      label PNP ID
+      .field= machine.get('pnpId')
+    .field
+      label UUID
+      .field= machine.get('uuid')
 .actions
-  .ui.negative.button Cancel
-  .ui.positive.button OK
+  .ui.primary.button Done

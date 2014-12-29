@@ -15,6 +15,6 @@ ports.list = (callback) ->
   if callback?
     stream.reduce([], '.push').onValue callback
   else
-    stream
+    stream.flatMap Bacon.fromArray
 
 module.exports = ports

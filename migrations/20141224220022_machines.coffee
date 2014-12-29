@@ -5,10 +5,10 @@ exports.up = (knex, Promise) ->
     table.string 'pnpId'
     table.string 'name'
     table.string 'type'
+    table.boolean 'hasImage'
     table.json 'details'
-  
+
 
 
 exports.down = (knex, Promise) ->
   knex.schema.dropTable 'machines'
-  

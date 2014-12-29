@@ -10,9 +10,11 @@ INITIAL_STATE = require './sim-default-state'
 stateTransform = require './sim-state-transform'
 
 module.exports =
+# Despite the fact that `SimMachine` extends `Machine`, we don't use `SimMachine` in any of
+# the places that `Machine` subclasses are generally used. This is because `SimMachine` is supposed
+# to represent a machine that's only accessible through the port.
 class SimMachine extends Machine
-  constructor: ->
-    super
+  constructor: (@attributes, @port) ->
 
     # All moves are instantaneous. Maybe later I'll
     # add code so moves will take the amount of time
@@ -37,7 +39,7 @@ class SimMachine extends Machine
         partial = code.slice -1
       ->
 
-    # Keep track of the state of the machine and 
+    # Keep track of the state of the machine and
     # emit events appropriate to what the printer
     # is doing.
     @stateMachine =
@@ -53,4 +55,3 @@ class SimMachine extends Machine
     # Return our state machine's events on a delay
     # to simulate serial port latency etc.
     @stateMachine.delay(200)
-
