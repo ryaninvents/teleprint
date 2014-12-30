@@ -41,9 +41,7 @@ SimMachine = Backbone.Model.extend
     # Keep track of the state of the machine and
     # emit events appropriate to what the printer
     # is doing.
-    @stateMachine =
-      @writeStream.withStateMachine INITIAL_STATE, stateTransform
-        .name 'machine.stateMachine'
+    @stateMachine = @writeStream.withStateMachine INITIAL_STATE, stateTransform
 
   # Write the given data out to the printer.
   write: (data) ->

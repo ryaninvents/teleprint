@@ -26,9 +26,12 @@ Machine = Backbone.Model.extend
       @port = @get 'port'
       delete @attributes.port
       @set 'pnpId', @port.get 'pnpId'
-      @port.on 'open', => @trigger 'connect'
-      @port.on 'close', => @trigger 'disconnect'
-      @port.on 'error', (e) => @trigger 'error', e.toString()
+      @port.on 'open', => @trigger 'open'
+      @port.on 'close', => @trigger 'close'
+      @port.on 'error', (e) =>
+        @trigger 'err', e.toString()
+      @port.on 'data', (data) =>
+        @trigger 'data', data
       @port.on 'write', (data) => @trigger 'write', data
   connect: -> @port.open()
   disconnect: -> @port.close()
@@ -37,10 +40,15 @@ Machine = Backbone.Model.extend
     switch method
       when 'write'
         @write.apply @, args
+      when 'connect'
+        @connect()
+      when 'disconnect'
+        @disconnect()
       else
         if _.isFunction @code?[method]
           @code[method].apply @transform, args.concat (err, code) =>
             if err
+              console.error err.stack
               return @trigger 'error', err.toString()
             @write code
         else
@@ -53,7 +61,7 @@ Machine = Backbone.Model.extend
 # ### lookup()
 #
 # Find a machine based on its port's pnpId, or
-# create a new machine if we haven't seen this 
+# create a new machine if we haven't seen this
 # one before.
 #
 # Returns a stream that will emit a single

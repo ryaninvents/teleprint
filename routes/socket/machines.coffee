@@ -1,5 +1,6 @@
 Bacon = require 'baconjs'
 Machine = require '../../models/machine'
+_ = require 'lodash'
 
 module.exports = (ioServ) ->
   machines = ioServ.of("/machines")
@@ -12,23 +13,27 @@ module.exports = (ioServ) ->
     Machine.listVisible().on ACTION, (machine) ->
       machines.emit ACTION, machine.toJSON()
 
+  hookSockets = (machine) ->
+    sockets = ioServ.of("/machines/#{machine.get 'uuid'}")
+    console.log "Creating namespace #{sockets.name}"
+    sockets.on 'connection', (socket) ->
+      console.log "Connected to #{machine.get 'name'}"
+
+# This needs to be a `forEach` so we don't clobber the value of `ACTION`.
+      ['change','open','close'].forEach (ACTION) ->
+        machine.on ACTION, (machine) ->
+          socket.emit ACTION, machine.toJSON()
+      ['write','data','err'].forEach (ACTION) ->
+        machine.on ACTION, (data) ->
+          socket.emit ACTION, data
+      socket.on 'open', -> machine.connect()
+      socket.on 'close', -> machine.disconnect()
+      socket.on 'change', (json) ->
+        machine.set json
+      socket.on 'method', (method, args) ->
+        args = [args] unless _.isArray args
+        machine.runMethod method, args
+
 # Create a new namespace for each machine
-  Machine.listVisible().on 'add', (machine) ->
-    socket = ioServ.of("/machines/#{machine.id}")
-    machineActions = [
-      'change'
-      'connect'
-      'disconnect'
-      'write'
-      'data'
-      'error'
-    ]
-    for ACTION in machineActions
-      machine.on ACTION, (machine) ->
-        socket.emit ACTION, machine.toJSON()
-    socket.on 'connect', -> machine.connect()
-    socket.on 'disconnect', -> machine.disconnect()
-    socket.on 'change', (json) ->
-      machine.set json
-    socket.on 'method', (method, args) ->
-      machine.runMethod method, args
+  Machine.listVisible().on 'add', hookSockets
+  Machine.listVisible().forEach hookSockets

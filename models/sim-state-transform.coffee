@@ -43,9 +43,9 @@ actions =
       else
         Number(pos)
       if (@positioning is 'absolute') and @[axis]?
-        @axis = pos
+        @[axis] = pos
       else
-        @axis += pos
+        @[axis] += pos
     events
 
   # G1: Controlled move.
@@ -197,10 +197,10 @@ actions =
 module.exports = (state, gcode) ->
   state = _.clone state
   # Remove comments.
-  gcode = gcode.trim().split ';'
+  gcode = gcode.value().trim().split(';')[0]
   # TODO: line number/checksum checking.
   # For now, we're stripping and ignoring checksum stuff.
-  gcodeChecksum = gCode.trim().match /^N(\d+)\s+(.*)\s*\*(\d+)$/
+  gcodeChecksum = gcode.trim().match /^N(\d+)\s+(.*)\s*\*(\d+)$/
   if gcodeChecksum
     [line, gcode, checksum] = gcodeChecksum
   # Split on spaces.
@@ -211,11 +211,16 @@ module.exports = (state, gcode) ->
   # Have we implemented the desired action?
   if actions[action]?
     try
-      events = actions[action].apply state, gcode
+      events = actions[action].call state, args
     catch e
       events = [new Bacon.Error e.toString()]
       console.error e
+      console.error e.stack
+    events = events.map (e) ->
+      if e.isError?()
+        e
+      else
+        new Bacon.Next(e)
     [state, events]
   else
     [state, [Bacon.Error "Unrecognized action #{action}"]]
-

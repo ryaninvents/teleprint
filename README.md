@@ -28,4 +28,10 @@ serial ports.
 
 ## Running
 
-    npm start
+You can run `npm start` to get up and running quickly.
+
+If you'd like to use the simulated printer, run
+
+    bin/teleprint --sim
+
+For more options, run `bin/teleprint --help`.

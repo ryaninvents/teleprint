@@ -31,14 +31,14 @@ module.exports =
   # Endstop statuses.
   endstops:
     X:
-      min: off
-      max: on
+      min: on
+      max: off
     Y:
-      min: off
-      max: on
+      min: on
+      max: off
     Z:
-      min: off
-      max: on
+      min: on
+      max: off
   # Delta calibration
   deltaParams:
     diagonalRod: 250

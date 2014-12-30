@@ -21,11 +21,11 @@ SimPort = Port.extend
     str.onValue (data) =>
       @trigger 'data', data
     str.onError (err) =>
+      console.error "Port error!", err.stack
       @trigger 'error', err
   open: -> @trigger 'open'
   close: -> @trigger 'close'
   write: (data)->
-    console.log "Sending data:", data
     @machine.write data
     @trigger 'write', data
   flush: ->

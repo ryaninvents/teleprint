@@ -1,9 +1,13 @@
 Backbone = require 'backbone'
 Bacon = require 'baconjs'
 io = require '../../socket.io'
+_ = require 'lodash'
 
 module.exports =
 Machine = Backbone.Model.extend
+  initialize: ->
+    @on 'write', (data) -> console.log ">> #{data}"
+    @on 'data', (data) -> console.log "<< #{data}"
   idAttribute: 'uuid'
   meta: ->
     switch @get 'type'
@@ -12,13 +16,18 @@ Machine = Backbone.Model.extend
       else "#{@get('details')?.baudrate or 'Unknown'} baudrate (#{@get 'type'})"
   hasImage: -> @get 'hasImage'
   hookSocket: ->
-    @socket ?= io("/machines/#{@id}")
+    if @socket? then return @socket
+    @socket = io("/machines/#{@id}")
+    console.log "Connecting to socket namespace /machines/#{@id}"
     @socket.on 'change', (json) => @set json
-    @socket.on 'connect', => @connected = yes
-    @socket.on 'disconnect', => @connected = no
+    @socket.on 'open', => @connected = yes
+    @socket.on 'close', => @connected = no
     @socket.on 'write', (data) => @trigger 'write', data
     @socket.on 'data', (data) => @trigger 'data', data
-    @socket.on 'error', (data) => @trigger 'error', data
+    @socket.on 'err', (data) => @trigger 'err', data
+    @socket
+  write: (data) ->
+    @hookSocket().emit 'method', 'write', data
   connect: ->
 ,
   getByID: (id) ->
@@ -30,7 +39,7 @@ Machine.Collection = Backbone.Collection.extend
 
 Machine.list = new Machine.Collection()
 Machine.ready = (fn) ->
-  Machine.list.on 'ready', fn
+  Machine.list.on 'ready', _.once fn
 
 socket = io('/machines')
 socket.on 'initial-list', (machines) ->

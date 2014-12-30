@@ -7,7 +7,6 @@ ip = _.flatten(_.values(require("os").networkInterfaces())).filter((iface) ->
 ).map((iface) ->
   iface.address
 )[0]
-console.log ip
 
 # Match all routes except our static files we want to serve.
 router.get /^(?!\/?(js|css|tpl|socket)).*$/, (req, res) ->
