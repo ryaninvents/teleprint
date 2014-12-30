@@ -11,10 +11,10 @@ ports = _.mapValues portTypes, (moduleName) ->
 ports.list = (callback) ->
   stream = Bacon.fromArray _.keys portTypes
     .flatMap (key) ->
-      Bacon.fromNodeCallback ports[key].list
+      Bacon.fromNodeCallback ports[key], 'list'
   if callback?
     stream.reduce([], '.push').onValue callback
   else
-    stream.flatMap Bacon.fromArray
+    stream.flatMap (x) -> console.log x; Bacon.fromArray x
 
 module.exports = ports

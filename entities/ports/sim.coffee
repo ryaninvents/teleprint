@@ -15,6 +15,7 @@ port =
   getReadStream: machine.getReadStream.bind machine
   comName: machine.attributes.comName
   pnpId: machine.attributes.pnpId
+  open: (callback) -> callback(null)
 
 machine.port = port
 

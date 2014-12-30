@@ -13,6 +13,10 @@ MachineCard = Backbone.View.extend
     @$('[data-action="edit"]').off('click').click =>
       @dialog ?= new MachineSettingsDialog(model: @model)
       @dialog.show()
+    @$('.corner.label').css 'display', if @model.get('active')
+      'block'
+    else
+      'none'
     @
   show: ->
     @render()

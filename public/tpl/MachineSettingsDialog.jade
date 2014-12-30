@@ -14,9 +14,9 @@
         input(value=machine.get('name'))
     .field
       label PNP ID
-      .field= machine.get('pnpId')
+      .field(style="max-width:100%;overflow-x:ellipsis;white-space:nowrap;"): tt= machine.get('pnpId')
     .field
       label UUID
-      .field= machine.get('uuid')
+      .field: tt= machine.get('uuid')
 .actions
   .ui.primary.button Done
