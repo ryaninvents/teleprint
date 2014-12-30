@@ -26,12 +26,26 @@ Machine = Backbone.Model.extend
       @port = @get 'port'
       delete @attributes.port
       @set 'pnpId', @port.get 'pnpId'
-  connect: ->
-    @port.open()
-    throw new Error 'not done yet'
-  disconnect: ->
-    @port.close()
-    throw new Error 'not done yet'
+      @port.on 'open', => @trigger 'connect'
+      @port.on 'close', => @trigger 'disconnect'
+      @port.on 'error', (e) => @trigger 'error', e.toString()
+      @port.on 'write', (data) => @trigger 'write', data
+  connect: -> @port.open()
+  disconnect: -> @port.close()
+  write: (data) -> @port.write data
+  runMethod: (method, args) ->
+    switch method
+      when 'write'
+        @write.apply @, args
+      else
+        if _.isFunction @code?[method]
+          @code[method].apply @transform, args.concat (err, code) =>
+            if err
+              return @trigger 'error', err.toString()
+            @write code
+        else
+          codeName = @code.constructor.name
+          @trigger 'error', "#{codeName}.#{method} is not a method"
 ,
 # ## Static methods
   listVisible: -> machineList
@@ -50,10 +64,12 @@ Machine = Backbone.Model.extend
 
     if m = machineList.find withPnpMatch
       return Bacon.once m
+    console.log "Matching on #{port.get 'pnpId'}"
     stream = Bacon.fromPromise(
       db('machines').select('*')
         .where pnpId: port.get('pnpId')
     ).map (results) ->
+      console.log "Found #{results.length} results"
       if results.length
         row = results[0]
         row.port = port
@@ -68,7 +84,7 @@ Machine = Backbone.Model.extend
           hasImage: no
           port: port
       machine = new Machine(row)
-    saveStream = stream.filter (machine) -> machine.get('pnpId') and (not machine.get 'saved')
+    saveStream = stream.filter (machine) -> machine.get('pnpId') and (machine.get('saved') is no)
       .flatMap (machine) ->
         console.log "Saving machine #{machine.get('uuid')[0..6].toUpperCase()}"
         toSave =

@@ -1,6 +1,7 @@
 Backbone = require 'backbone'
 
 Machine = require './models/Machine.coffee'
+MachineControls = require './views/MachineControls.coffee'
 MachineSelectionView = require './views/MachineSelectionView.coffee'
 
 module.exports =
@@ -15,12 +16,11 @@ Router = Backbone.Router.extend
     $('.main').html(@view.render().$el)
     $('#side-menu > .item').removeClass('active')
     $('#machine').addClass('active')
-  machine: (id)->
-    $('.main').text "Loading..."
-    Machine.getByID(id).onValue (machine) ->
-      console.log "Machine #{id}", machine
-      $('.main').text "Viewing controls for #{machine.get 'name'}"
-      machine.connect().onValue -> console.log "Connected!"
+  machine: (id) ->
+    Machine.ready ->
+      machine = Machine.getByID(id)
+      view = new MachineControls(model:machine)
+      $('.main').html view.render().$el
   model: ->
     $('.main').html('<input type="file" id="file-select"/><a class="ui button">Pick file</a>')
     $('.main a.button').click =>

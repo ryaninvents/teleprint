@@ -16,34 +16,27 @@ cxDiff = (big, little) ->
 module.exports =
 MachineSelectionView = Backbone.View.extend
   initialize: ->
-    MachineSelectionView.collection ?= new Machine.Collection()
+    MachineSelectionView.collection ?= Machine.list
     {@collection} = MachineSelectionView
-    unless MachineSelectionView.updateStream?
-      update = MachineSelectionView.updateStream = Bacon.interval(2000)
-      update.onValue =>
-        @collection.fetch()
-    @seen = []
     @cards = {}
-    @collection.on 'sync', => @onSync()
-    @collection.fetch()
+    @collection.on 'add', (model) => @onAdd model
+    @collection.on 'remove', (model) => @onRemove model
   onSync: ->
-    entered = cxDiff @collection.models, @seen
-    exited = cxDiff @seen, @collection.models
-    @seen = _.reject @seen.concat(entered), (m1) ->
-      _.some exited, (m2) -> m1.id is m2.id
-    _.forEach entered, (model) =>
-      card = @cards[model.id] ?= new MachineCard(model: model)
-      card.render()
-      unless card.$el.is ':visible'
-        @$('.cards').append card.$el
-        card.show()
-    _.forEach exited, (model) =>
-      card = @cards[model.id]
-      card.hide()
     @$('.instructions').text if @collection.size()
       "Choose a machine to connect to."
     else
       "No machines found."
+  onAdd: (model) ->
+    card = @cards[model.id] ?= new MachineCard(model: model)
+    card.render()
+    unless card.$el.is ':visible'
+      @$('.cards').append card.$el
+      card.show()
+    @onSync()
+  onRemove: (model) ->
+    card = @cards[model.id]
+    card.hide()
+    @onSync()
   render: ->
     @$el.html(tpl())
     _.forOwn @cards, (card) =>

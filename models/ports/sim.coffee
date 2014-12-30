@@ -25,9 +25,11 @@ SimPort = Port.extend
   open: -> @trigger 'open'
   close: -> @trigger 'close'
   write: (data)->
+    console.log "Sending data:", data
     @machine.write data
     @trigger 'write', data
   flush: ->
+# ## Static methods
 ,
   enumerate: -> ports
   type: -> "sim"
