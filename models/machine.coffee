@@ -117,16 +117,21 @@ Machine.Collection = Backbone.Collection.extend
 machineList = new Machine.Collection
 
 portTypes = Port.types()
-portTypes.forEach (type) ->
-  addByPort = (p) ->
-    Machine.lookup(p).onValue (machine) ->
-      machineList.push machine
-  ports = type.enumerate()
-  console.log type.longname(), ports.map (p) -> p.toJSON()
-  ports.forEach addByPort
-  ports.on 'add', addByPort
+
+
+db.migrate.latest
+  directory: path.join __dirname, '../migrations'
+.then ->
+  portTypes.forEach (type) ->
+    addByPort = (p) ->
+      Machine.lookup(p).onValue (machine) ->
+        machineList.push machine
+    ports = type.enumerate()
+    console.log type.longname(), ports.map (p) -> p.toJSON()
+    ports.forEach addByPort
+    ports.on 'add', addByPort
 # TODO implement this
-  ports.on 'remove', (port) ->
+    ports.on 'remove', (port) ->
 
 process.on 'exit', ->
   console.log "Closing connections..."
