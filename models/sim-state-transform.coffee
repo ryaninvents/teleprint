@@ -93,6 +93,9 @@ actions =
     ['ok']
   # M92: Set axis steps per unit (mm or in).
   M92: (args) ->
+    # TODO: error message here
+    unless args.length
+      return ['ok']
     steps = args[0].match /^[A-Z]([.\d]+)$/
     unless steps?
       return [new Bacon.Error "M92 requires axis and steps per unit"]
@@ -102,6 +105,9 @@ actions =
   #
   # TODO: simulate "getting up to temp" so we can draw graphs
   M104: (args) ->
+    unless args.length
+      # TODO: error message here
+      return ['ok']
     temp = args[0].match /^S([.\d]+)$/
     unless temp?
       return [new Bacon.Error "M104 requires extruder temp as S##"]
@@ -116,6 +122,9 @@ actions =
   M109: (args) -> actions.M104.apply @, arguments
   # M110: Set line number.
   M110: (args) ->
+    unless args.length
+      # TODO: error message here
+      return ['ok']
     line = args[0].match /^N(\d+)$/
     unless line? and (Number(line[1]) > 0)
       return [new Bacon.Error "M110 requires line # as N##"]
@@ -147,6 +156,9 @@ actions =
     [message]
   # M140: Set bed temperature and return immediately.
   M140: (args) ->
+    # TODO: error message here
+    unless args.length
+      return ['ok']
     temp = args[0].match /^S([.\d]+)$/
     unless temp?
       return [new Bacon.Error "M140 requires bed temp as S##"]

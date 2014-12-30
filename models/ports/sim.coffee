@@ -26,6 +26,7 @@ SimPort = Port.extend
   open: -> @trigger 'open'
   close: -> @trigger 'close'
   write: (data)->
+    return unless data.length
     @machine.write data
     @trigger 'write', data
   flush: ->
