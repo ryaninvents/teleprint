@@ -56,3 +56,8 @@ socket.on 'add', (machine) ->
   Machine.list.add new Machine machine
 socket.on 'remove', (machine) ->
   Machine.list.findWhere(id:machine.id)?.destroy()
+onSockConnect = -> $.toast('Connected to server')
+onSockDisconnect = -> $.toast 'Server connection lost'
+
+socket.on 'connect', onSockConnect
+socket.on 'disconnect', onSockDisconnect
