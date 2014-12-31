@@ -21,6 +21,7 @@ Router = Backbone.Router.extend
       machine = Machine.getByID(id)
       view = new MachineControls(model:machine)
       $('.main').html view.render().$el
+      machine.connect()
   model: ->
     $('.main').html('<input type="file" id="file-select"/><a class="ui button">Pick file</a>')
     $('.main a.button').click =>

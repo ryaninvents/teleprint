@@ -6,8 +6,13 @@ _ = require 'lodash'
 module.exports =
 Machine = Backbone.Model.extend
   initialize: ->
-    @on 'write', (data) -> console.log ">> #{data}"
-    @on 'data', (data) -> console.log "<< #{data}"
+    if @attributes.connected?
+      @connected = @get 'connected'
+      delete @attributes.connected
+    if @connected
+      @trigger 'open'
+    @on 'open', => @connected = yes; console.log 'machine connected'
+    @on 'close', => @connected = no; console.log 'machine disconnected'
   idAttribute: 'uuid'
   meta: ->
     switch @get 'type'
@@ -15,20 +20,20 @@ Machine = Backbone.Model.extend
       when 'sim' then "Simulated machine"
       else "#{@get('details')?.baudrate or 'Unknown'} baudrate (#{@get 'type'})"
   hasImage: -> @get 'hasImage'
-  hookSocket: ->
-    if @socket? then return @socket
-    @socket = io("/machines/#{@id}")
-    console.log "Connecting to socket namespace /machines/#{@id}"
-    @socket.on 'change', (json) => @set json
-    @socket.on 'open', => @connected = yes
-    @socket.on 'close', => @connected = no
-    @socket.on 'write', (data) => @trigger 'write', data
-    @socket.on 'data', (data) => @trigger 'data', data
-    @socket.on 'err', (data) => @trigger 'err', data
-    @socket
+  socket: ->
+    if @_socket? then return @_socket
+    @_socket = io("/machines/#{@id}")
+    @_socket.on 'change', (json) => @set json
+    @_socket.on 'open', => @trigger 'open'
+    @_socket.on 'close', => @trigger 'close'
+    @_socket.on 'write', (data) => @trigger 'write', data
+    @_socket.on 'data', (data) => @trigger 'data', data
+    @_socket.on 'err', (data) => @trigger 'err', data
+    @_socket
   write: (data) ->
-    @hookSocket().emit 'method', 'write', data
+    @socket().emit 'method', 'write', data
   connect: ->
+    @socket().emit 'method', 'connect'
 ,
   getByID: (id) ->
     Machine.list.find (m) -> m.id is id

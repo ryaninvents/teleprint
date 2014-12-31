@@ -1,5 +1,4 @@
 Backbone = require 'backbone'
-require '../semantic.min.js'
 _ = require 'lodash'
 Bacon = require 'baconjs'
 
@@ -19,8 +18,11 @@ MachineSelectionView = Backbone.View.extend
     MachineSelectionView.collection ?= Machine.list
     {@collection} = MachineSelectionView
     @cards = {}
-    @collection.on 'add', (model) => @onAdd model
-    @collection.on 'remove', (model) => @onRemove model
+    setTimeout =>
+      @collection.each @onAdd.bind @
+      @collection.on 'add', @onAdd.bind @
+      @collection.on 'remove', @onRemove.bind @
+    , 100
   onSync: ->
     @$('.instructions').text if @collection.size()
       "Choose a machine to connect to."
@@ -29,24 +31,29 @@ MachineSelectionView = Backbone.View.extend
   onAdd: (model) ->
     card = @cards[model.id] ?= new MachineCard(model: model)
     card.render()
-    unless card.$el.is ':visible'
+    unless $.contains @$el, card.$el
       @$('.cards').append card.$el
-      card.show()
+    card.show()
+    model.on 'open close', @updateHeader.bind @
+    @updateHeader()
     @onSync()
   onRemove: (model) ->
     card = @cards[model.id]
     card.hide()
     @onSync()
+  updateHeader: ->
+    $h2 = @$('h2')
+    count = @collection.filter((m) -> m.connected).length
+    text = if count is 0
+      "No machines connected"
+    else if count is 1
+      "1 machine connected"
+    else
+      "#{count} machines connected"
+    $h2.text text
   render: ->
     @$el.html(tpl())
     _.forOwn @cards, (card) =>
       @$('.cards').append card.render().$el
-    ###
-    if @rendered then return @
-    @rendered = yes
-    @$('.card').hide()
-    setTimeout =>
-      @$('.card').transition('horizontal flip')
-    , 2000
-    ###
+    @onSync()
     @

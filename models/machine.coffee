@@ -26,23 +26,35 @@ Machine = Backbone.Model.extend
       @port = @get 'port'
       delete @attributes.port
       @set 'pnpId', @port.get 'pnpId'
-      @port.on 'open', => @trigger 'open'
-      @port.on 'close', => @trigger 'close'
+      @port.on 'open', =>
+        @trigger 'open'
+        @set 'connected', yes
+      @port.on 'close', =>
+        @trigger 'close'
+        @set 'connected', no
       @port.on 'error', (e) =>
         @trigger 'err', e.toString()
       @port.on 'data', (data) =>
         @trigger 'data', data
       @port.on 'write', (data) => @trigger 'write', data
-  connect: -> @port.open()
-  disconnect: -> @port.close()
-  write: (data) -> @port.write data
+  connect: ->
+    unless @get 'connected'
+      @port.open()
+  disconnect: ->
+    if @get 'connected'
+      @port.close()
+  write: (data) ->
+    if @get 'connected'
+      @port.write data
+    else
+      @trigger 'error', "Cannot write to machine; not connected"
   runMethod: (method, args) ->
     switch method
       when 'write'
         @write.apply @, args
-      when 'connect'
+      when 'connect', 'open'
         @connect()
-      when 'disconnect'
+      when 'disconnect', 'close'
         @disconnect()
       else
         if _.isFunction @code?[method]

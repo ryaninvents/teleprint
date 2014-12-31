@@ -1,12 +1,12 @@
+.green.ui.ribbon.label(title='Connected', class=machine.connected?'':'hidden', style='position:absolute;top:1rem;left:-1.1rem;z-index:2;', data-element="connection-status")
+  //i.fa.fa-plug
+  | Connected
 if machine.hasImage()
   a.image(href='#machine/'+machine.id, style="height:12rem;color:rgba(0,0,0,0.7);vertical-align:middle;text-align:center;")
-    i.fa.fa-question-circle(style="font-size: 8rem;padding-top:2rem;")
 else
   a.image(href='#machine/'+machine.id, style="height:12rem;color:rgba(0,0,0,0.7);vertical-align:middle;text-align:center;")
     i.fa.fa-cogs(style="font-size: 8rem;padding-top:2rem;")
 .content
-  .green.ui.corner.label(title='Connected', style='display: none;padding-top: 6px;padding-left:16px;')
-    i.fa.fa-plug
   a(data-action="edit", title="Settings for this machine"): i.right.floated.icon.fa.fa-wrench
   .header= machine.get('name')
   .meta= machine.meta()

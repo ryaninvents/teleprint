@@ -21,13 +21,11 @@ module.exports = (ioServ) ->
 
 # This needs to be a `forEach` so we don't clobber the value of `ACTION`.
       ['change','open','close'].forEach (ACTION) ->
-        machine.on ACTION, (machine) ->
+        machine.on ACTION, () ->
           socket.emit ACTION, machine.toJSON()
       ['write','data','err'].forEach (ACTION) ->
         machine.on ACTION, (data) ->
           socket.emit ACTION, data
-      socket.on 'open', -> machine.connect()
-      socket.on 'close', -> machine.disconnect()
       socket.on 'change', (json) ->
         machine.set json
       socket.on 'method', (method, args) ->

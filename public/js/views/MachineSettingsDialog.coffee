@@ -1,5 +1,4 @@
 Backbone = require 'backbone'
-require '../semantic.min.js'
 
 tpl = require '../../tpl/MachineSettingsDialog.jade'
 
