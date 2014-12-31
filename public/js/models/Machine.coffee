@@ -58,6 +58,7 @@ Machine.ready = (fn) ->
 socket = io('/machines')
 socket.on 'initial-list', (machines) ->
   console.log 'initial-list', machines
+  Machine.list.set []
   Machine.list.set machines.map (m) -> new Machine m
   Machine.list.trigger 'ready'
   Machine.ready = (fn) -> fn()
