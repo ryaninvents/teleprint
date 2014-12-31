@@ -14,7 +14,7 @@ MachineControls = Backbone.View.extend
       .map -> $gcodeInput.val()
       .onValue (code) =>
         $gcodeInput.val('')
-        @model.write code
+        @model.write "#{code}\n"
     @model.on 'write', (data) =>
       @$('pre').append ">> #{data}\n"
     @model.on 'data', (data) =>

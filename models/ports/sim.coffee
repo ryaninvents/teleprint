@@ -37,6 +37,7 @@ SimPort = Port.extend
   longname: -> "Simulated machine"
   description: ->
     "A simulation of a 3D printer."
+  options: ->
 
 
 if opts.sim

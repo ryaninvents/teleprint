@@ -156,12 +156,18 @@ db.migrate.latest
     addByPort = (p) ->
       Machine.lookup(p).onValue (machine) ->
         machineList.push machine
+    removeByPort = (p) ->
+      machine = (machineList.filter (machine) ->
+        machine.get('pnpId') is p.get('pnpId')
+      )[0]
+      unless machine?
+        return
+      machineList.remove machine
     ports = type.enumerate()
     console.log type.longname(), ports.map (p) -> p.toJSON()
     ports.forEach addByPort
     ports.on 'add', addByPort
-# TODO implement this
-    ports.on 'remove', (port) ->
+    ports.on 'remove', removeByPort
 
 process.on 'exit', ->
   console.log "Closing connections..."

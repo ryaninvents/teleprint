@@ -64,7 +64,10 @@ socket.on 'initial-list', (machines) ->
   Machine.ready = (fn) -> fn()
 socket.on 'add', (machine) ->
   Machine.list.add new Machine machine
-socket.on 'remove', (machine) ->
+socket.on 'remove', (json) ->
+  {uuid} = json
+  machine = Machine.list.filter((m) -> m.id is uuid)[0]
+  return unless machine?
   Machine.list.remove machine
 onSockConnect = ->
   $.toast text: 'Connected to server', showHideTransition: 'plain', allowToastClose: no

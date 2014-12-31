@@ -9,8 +9,9 @@ module.exports = (ioServ) ->
     socket.emit 'initial-list', Machine.listVisible().models
 
 # Bind action handlers to the socket
-  for ACTION in ['add','remove']
+  ['add','remove'].forEach (ACTION) ->
     Machine.listVisible().on ACTION, (machine) ->
+      console.log "Machine #{ACTION} in socket/machines", machine.get 'name'
       machines.emit ACTION, machine.toJSON()
 
   hookSockets = (machine) ->
