@@ -58,6 +58,7 @@ app.use (err, req, res, next) ->
 
 module.exports = (callback) ->
   port = opts.port
+  address = opts.address
   server = require('http').Server(app)
   require('./routes/socket')(server)
-  server.listen port, => console.log "Listening on #{port}"
+  server.listen port, address, => console.log "Listening on #{address}:#{port}"

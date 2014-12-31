@@ -35,3 +35,13 @@ If you'd like to use the simulated printer, run
     bin/teleprint --sim
 
 For more options, run `bin/teleprint --help`.
+
+    $  bin/teleprint --help
+
+    Usage: node teleprint [options]
+
+    Options:
+    -p, --port      Select which port to run on
+    -a, --address   Set the address to listen on (default is localhost)
+    --any-address   Respond to requests to any address (insecure)
+    -s, --sim       Enable simulated printers
