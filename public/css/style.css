@@ -28,3 +28,31 @@ input[type="file"] {
 a.item {
   text-overflow: ellipsis;
 }
+
+.ui.image.with-image,
+.ui.image.without-image {
+  height: 12rem;
+  color:rgba(0,0,0,0.7);
+  text-align: center;
+}
+
+.ui.image.without-image {
+  vertical-align: middle;
+}
+
+.ui.image.with-image {
+  background-size: contain !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+.ui.image.with-image > i {
+  display: none;
+}
+
+.card > .ribbon{
+  position:absolute !important;
+  top:1rem !important;
+  left:-1.1rem !important;
+  z-index:2 !important;
+}

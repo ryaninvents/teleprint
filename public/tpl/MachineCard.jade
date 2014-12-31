@@ -1,12 +1,8 @@
-.green.ui.ribbon.label(title='Connected', class=machine.connected?'':'hidden', style='position:absolute;top:1rem;left:-1.1rem;z-index:2;', data-element="connection-status")
-  //i.fa.fa-plug
+.ui.ribbon.label(title='Connected', class=(machine.connected?'':'hidden')+' '+(machine.socketConnected?'green':'gray'), data-element="connection-status")
   | Connected
-if machine.hasImage()
-  a.image(href='#machine/'+machine.id, style="height:12rem;color:rgba(0,0,0,0.7);vertical-align:middle;text-align:center;")
-else
-  a.image(href='#machine/'+machine.id, style="height:12rem;color:rgba(0,0,0,0.7);vertical-align:middle;text-align:center;")
-    i.fa.fa-cogs(style="font-size: 8rem;padding-top:2rem;")
+a.ui.image(href='#machine/'+machine.id, class=(machine.hasImage()?'with-image':'without-image'), style=(machine.hasImage()?"background-image:url("+machine.get('image')+")":''))
+  i.fa.fa-cogs(style="font-size: 8rem;padding-top:2rem;")
 .content
   a(data-action="edit", title="Settings for this machine"): i.right.floated.icon.fa.fa-wrench
-  .header= machine.get('name')
+  .header(data-field="name")= machine.get('name')
   .meta= machine.meta()

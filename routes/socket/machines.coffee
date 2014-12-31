@@ -27,6 +27,7 @@ module.exports = (ioServ) ->
         machine.on ACTION, (data) ->
           socket.emit ACTION, data
       socket.on 'change', (json) ->
+        console.log "set", json
         machine.set json
       socket.on 'method', (method, args) ->
         args = [args] unless _.isArray args

@@ -3,10 +3,11 @@
   .ui.medium.image(style="height:12rem;background-color:rgba(0,0,0,0.05);color:rgba(0,0,0,0.7);vertical-align:middle;text-align:center;")
     i.fa.fa-cogs(style="font-size:8rem;padding-top:2rem;padding-bottom:2rem;")
     div(style="position:absolute;top:4px;right:0;")
-      a.red.circular.ui.icon.button(title="Delete picture")
+      a.red.circular.ui.icon.button(title="Delete picture", data-action="delete-image")
         i.fa.fa-trash
-      a.purple.circular.ui.icon.button(title="Change picture")
+      a.purple.circular.ui.icon.button(title="Change picture", data-action="change-image")
         i.fa.fa-pencil
+      input(type="file", data-element="file-input", accept="image/*")
   .description: .ui.form
     .field
       label Machine name

@@ -22,6 +22,7 @@ module.exports =
 # # Class Machine
 Machine = Backbone.Model.extend
   initialize: ->
+    @on 'change', @save.bind(@)
     if @get('port')?
       @port = @get 'port'
       delete @attributes.port
@@ -37,6 +38,8 @@ Machine = Backbone.Model.extend
       @port.on 'data', (data) =>
         @trigger 'data', data
       @port.on 'write', (data) => @trigger 'write', data
+  defaults: ->
+    image: ''
   connect: ->
     unless @get 'connected'
       @port.open()
@@ -66,6 +69,21 @@ Machine = Backbone.Model.extend
         else
           codeName = @code.constructor.name
           @trigger 'error', "#{codeName}.#{method} is not a method"
+  save: ->
+    row =
+      pnpId: @get 'pnpId'
+      name: @get 'name'
+      type: @get 'type'
+      image: @get 'image'
+      details: _.omit @attributes, (val, key) ->
+        key in ['saved','uuid','pnpId','name','type','details','image']
+    console.log 'saving', row
+    db('machines')
+      .where('uuid','=',@get 'uuid')
+      .update row
+      .then => console.log 'Saved'
+      .catch (err) => @trigger 'err', err.stack.toString()
+
 ,
 # ## Static methods
   listVisible: -> machineList
@@ -101,7 +119,7 @@ Machine = Backbone.Model.extend
           name: "Machine #{id[0...6].toUpperCase()}"
           saved: no
           type: port.constructor.type()
-          hasImage: no
+          image: ''
           port: port
       machine = new Machine(row)
     saveStream = stream.filter (machine) -> machine.get('pnpId') and (machine.get('saved') is no)
@@ -112,9 +130,9 @@ Machine = Backbone.Model.extend
           pnpId: machine.get 'pnpId'
           name: machine.get 'name'
           type: machine.get 'type'
-          hasImage: machine.get 'hasImage'
+          image: machine.get 'image'
           details: _.omit machine.attributes, (val, key) ->
-            key in ['saved','uuid','pnpId','name','type']
+            key in ['saved','uuid','pnpId','name','type', 'image', 'details']
         Bacon.fromPromise(db.insert(toSave).into('machines')).map -> machine
     saveStream.onValue (machine) ->
         console.log "Successfully saved machine #{machine.get('uuid')[0...6].toUpperCase()}"

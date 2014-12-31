@@ -13,27 +13,35 @@ Machine = Backbone.Model.extend
       @trigger 'open'
     @on 'open', => @connected = yes; console.log 'machine connected'
     @on 'close', => @connected = no; console.log 'machine disconnected'
+    @on 'change', (model, opt) => unless opt.via is 'socket' then @sendChanges()
+    @socketConnected = (Machine.list.status is 'connected')
   idAttribute: 'uuid'
   meta: ->
     switch @get 'type'
       when 'serial' then "#{@get('details')?.baudrate or 'Unknown'} baudrate"
       when 'sim' then "Simulated machine"
       else "#{@get('details')?.baudrate or 'Unknown'} baudrate (#{@get 'type'})"
-  hasImage: -> @get 'hasImage'
+  hasImage: -> Boolean @get 'image'
   socket: ->
     if @_socket? then return @_socket
     @_socket = io("/machines/#{@id}")
-    @_socket.on 'change', (json) => @set json
+    @_socket.on 'change', (json) => @set json, via: 'socket'
     @_socket.on 'open', => @trigger 'open'
     @_socket.on 'close', => @trigger 'close'
     @_socket.on 'write', (data) => @trigger 'write', data
     @_socket.on 'data', (data) => @trigger 'data', data
     @_socket.on 'err', (data) => @trigger 'err', data
+    # Hook into the global machine-list socket to check server state.
+    ['connect','reconnect'].forEach (EVENT) =>
+      socket.on EVENT, => @socketConnected = yes
+    socket.on 'disconnect', => @socketConnected = no
     @_socket
   write: (data) ->
     @socket().emit 'method', 'write', data
   connect: ->
     @socket().emit 'method', 'connect'
+  sendChanges: ->
+    @socket().emit 'change', @changedAttributes()
 ,
   getByID: (id) ->
     Machine.list.find (m) -> m.id is id
@@ -43,6 +51,7 @@ Machine.Collection = Backbone.Collection.extend
   model: Machine
 
 Machine.list = new Machine.Collection()
+Machine.list.status = 'disconnected'
 Machine.ready = (fn) ->
   Machine.list.on 'ready', _.once fn
 
@@ -55,9 +64,16 @@ socket.on 'initial-list', (machines) ->
 socket.on 'add', (machine) ->
   Machine.list.add new Machine machine
 socket.on 'remove', (machine) ->
-  Machine.list.findWhere(id:machine.id)?.destroy()
-onSockConnect = -> $.toast('Connected to server')
-onSockDisconnect = -> $.toast 'Server connection lost'
+  Machine.list.remove machine
+onSockConnect = ->
+  $.toast text: 'Connected to server', showHideTransition: 'plain', allowToastClose: no
+  Machine.list.trigger 'connect'
+  Machine.list.status = 'connected'
+onSockDisconnect = ->
+  $.toast text: 'Server connection lost', showHideTransition: 'plain', allowToastClose: no
+  Machine.list.trigger 'disconnect'
+  Machine.list.status = 'disconnected'
+
 
 socket.on 'connect', onSockConnect
 socket.on 'disconnect', onSockDisconnect
