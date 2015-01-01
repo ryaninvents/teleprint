@@ -1,27 +1,16 @@
 h2 Controls for #{machine.get('name')}
 
 .ui.stackable.grid
-  .eight.wide.column
-    div(data-view="jog")
-  .eight.wide.column
-  .four.wide.column
-    .ui.statistic
-      .label Extruder
-      .value 21&deg;C
-      .label
-        | Target: #{' '}
-        a(href=document.location.href) 205&deg;C
-  .four.wide.column
-    .ui.statistic
-      .label Print bed
-      .value 20&deg;C
-      .label
-        | Target: #{' '}
-        a(href=document.location.href) 30&deg; C
-  .eight.wide.column
-  .sixteen.wide.column
-    .ui.form
-      .field
-        label Type some gcode
-        input(data-element="gcode-input")
-      .field(data-element="comm-display"): pre
+  .doubling.row
+    .eight.wide.column(data-view="jog")
+    .eight.wide.column
+  .doubling.row
+    .eight.wide.column(data-view="temp")
+    .eight.wide.column
+  .row
+    .sixteen.wide.column
+      .ui.form
+        .field
+          label Type some gcode
+          input(data-element="gcode-input")
+        .field(data-element="comm-display"): pre

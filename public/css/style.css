@@ -58,7 +58,7 @@ a.item {
 }
 
 .rot45 {
-  transform: translateY(1em) translateX(2em) rotate(45deg);
+  transform: translateY(1em) rotate(45deg);
 }
 
 .rot45 .ui.button {
@@ -78,5 +78,17 @@ a.item {
 .rot45 .ui.button i {
   height: 100%;
   padding-top: 0.35em;
-  transform: rotate(-45deg);
+  transform: rotate(-45deg) translateY(0.1em);
+}
+
+a.adjustable {
+  border-bottom: 1px #009fda dotted;
+}
+
+.ui.inline.dropdown > .text {
+  border-bottom: 1px rgba(0,0,0,0.8) dotted;
+}
+
+.statistic .ui.inline.dropdown > .text {
+  border-bottom: 1px rgba(0,0,0,0.4) dotted;
 }

@@ -1,6 +1,6 @@
 .ui.grid
   .eight.wide.column(style='text-align:center;')
-    div(style="width:6em;height:6em;position:relative;")
+    div(style="width:6em;height:8em;position:relative;margin: auto;")
       div.rot45
         div
           a.big.teal.ui.button
@@ -12,10 +12,23 @@
             i.fa.fa-arrow-left
           a.big.teal.ui.button
             i.fa.fa-arrow-down
-  .eight.wide.column
-    div(style='margin-bottom:0.35em;')
-      a.big.purple.ui.button
-        i.fa.fa-arrow-up
-    div
-      a.big.purple.ui.button
-        i.fa.fa-arrow-down
+    | Jog X/Y by #{' '}
+    select.ui.inline.dropdown
+      option 0.1 mm
+      option 1 mm
+      option 10 mm
+      option 100 mm
+  .eight.wide.column(style='text-align:center;')
+    div(style='height:8em;')
+      div(style='margin-bottom:0.35em;')
+        a.big.purple.ui.button
+          i.fa.fa-arrow-up
+      div
+        a.big.purple.ui.button
+          i.fa.fa-arrow-down
+    | Jog Z by #{' '}
+    select.ui.inline.dropdown
+      option 0.1 mm
+      option 1 mm
+      option 10 mm
+      option 100 mm

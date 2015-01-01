@@ -1,0 +1,24 @@
+.eight.wide.column(style='text-align:center;')
+  .ui.statistic
+    .label Extruder
+    .value 
+      | 21&deg;C
+    .label
+      | Target: #{' '}
+      .ui.inline.dropdown
+        .text 205&deg;C
+        i.dropdown.icon
+        .menu
+          .input
+            input(placeholder="Temperature")
+          .item ABS (230&deg;C)
+          .item PLA (185&deg;C)
+.eight.wide.column(style='text-align:center;')
+  .ui.statistic
+    .label Print bed
+    .value 20&deg;C
+    .label
+      | Target: #{' '}
+      .ui.inline.dropdown
+        .text 30&deg; C
+        i.dropdown.icon
