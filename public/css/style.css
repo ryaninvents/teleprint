@@ -56,3 +56,27 @@ a.item {
   left:-1.1rem !important;
   z-index:2 !important;
 }
+
+.rot45 {
+  transform: translateY(1em) translateX(2em) rotate(45deg);
+}
+
+.rot45 .ui.button {
+  width: 2em;
+  height: 2em;
+  padding: 0;
+}
+
+.rot45 {
+  white-space: nowrap;
+}
+
+.rot45 > div:first-child {
+  margin-bottom: 0.3em;
+}
+
+.rot45 .ui.button i {
+  height: 100%;
+  padding-top: 0.35em;
+  transform: rotate(-45deg);
+}
