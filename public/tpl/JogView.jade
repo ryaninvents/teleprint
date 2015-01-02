@@ -1,14 +1,14 @@
-.ui.grid
-  .six.wide.column(style='text-align:center;')
+.ui.three.column.grid
+  .column(style='text-align:center;')
     div(style="width:6em;height:8em;position:relative;margin: auto;")
       div.rot45
         div
           a.big.teal.ui.button
             i.fa.fa-arrow-up
-          a.big.teal.ui.button
+          a.big.blue.ui.button
             i.fa.fa-arrow-right
         div
-          a.big.teal.ui.button
+          a.big.blue.ui.button
             i.fa.fa-arrow-left
           a.big.teal.ui.button
             i.fa.fa-arrow-down
@@ -18,7 +18,7 @@
       option 1 mm
       option 10 mm
       option 100 mm
-  .five.wide.column(style='text-align:center;')
+  .column(style='text-align:center;')
     div(style='height:8em;')
       div(style='margin-bottom:0.35em;')
         a.big.purple.ui.button
@@ -32,4 +32,17 @@
       option 1 mm
       option 10 mm
       option 100 mm
-  .six.wide.column
+  .column
+    .ui.small.vertical.buttons
+      a.blue.ui.button
+        i.home.icon
+        | X
+      a.teal.ui.button
+        i.home.icon
+        | Y
+      a.purple.ui.button
+        i.home.icon
+        | Z
+      a.red.ui.button
+        i.home.icon
+        | all

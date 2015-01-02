@@ -2,11 +2,11 @@ h2 Controls for #{machine.get('name')}
 
 .ui.stackable.grid
   .doubling.row
-    .eight.wide.column(data-view="jog")
     .eight.wide.column
-  .doubling.row
-    .eight.wide.column(data-view="temp")
-    .eight.wide.column
+      .row
+        .eight.wide.column(data-view="jog")
+        .eight.wide.column(data-view="temp")
+    .eight.wide.column(data-view="printer3D")
   .row
     .sixteen.wide.column
       .ui.form

@@ -4,6 +4,7 @@ _ = require 'lodash'
 
 JogView = require './JogView.coffee'
 TemperatureView = require './TemperatureView.coffee'
+Printer3DView = require './Printer3DView.coffee'
 
 tpl = require '../../tpl/MachineControls.jade'
 
@@ -17,6 +18,9 @@ MachineControls = Backbone.View.extend
 
     @temperatureView = new TemperatureView model: @model
     @$('[data-view="temp"]').html @temperatureView.render().$el
+
+    @printer3DView = new Printer3DView model: @model
+    @$('[data-view="printer3D"]').html @printer3DView.render().$el
 
     $gcodeInput = @$('[data-element="gcode-input"]')
     $gcodeInput.asEventStream('keyup')
