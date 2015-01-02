@@ -77,6 +77,7 @@ onSockDisconnect = ->
   $.toast text: 'Server connection lost', showHideTransition: 'plain', allowToastClose: no
   Machine.list.trigger 'disconnect'
   Machine.list.status = 'disconnected'
+  Machine.list.set []
 
 
 socket.on 'connect', onSockConnect

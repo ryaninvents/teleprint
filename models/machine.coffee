@@ -22,7 +22,6 @@ module.exports =
 # # Class Machine
 Machine = Backbone.Model.extend
   initialize: ->
-    @on 'change', @save.bind(@)
     if @get('port')?
       @port = @get 'port'
       delete @attributes.port
@@ -38,6 +37,12 @@ Machine = Backbone.Model.extend
       @port.on 'data', (data) =>
         @trigger 'data', data
       @port.on 'write', (data) => @trigger 'write', data
+
+    saveOn = ['name','image'].concat _.keys @port.constructor.options()
+    @on 'change', () =>
+      isect = _.intersection(saveOn, _.keys(@changedAttributes()))
+      if isect.length
+        @save()
   defaults: ->
     image: ''
   connect: ->
@@ -81,7 +86,7 @@ Machine = Backbone.Model.extend
     db('machines')
       .where('uuid','=',@get 'uuid')
       .update row
-      .then => console.log 'Saved'
+      .then =>
       .catch (err) => @trigger 'err', err.stack.toString()
 
 ,
@@ -102,12 +107,10 @@ Machine = Backbone.Model.extend
 
     if m = machineList.find withPnpMatch
       return Bacon.once m
-    console.log "Matching on #{port.get 'pnpId'}"
     stream = Bacon.fromPromise(
       db('machines').select('*')
         .where pnpId: port.get('pnpId')
     ).map (results) ->
-      console.log "Found #{results.length} results"
       if results.length
         row = results[0]
         row.port = port
@@ -124,7 +127,6 @@ Machine = Backbone.Model.extend
       machine = new Machine(row)
     saveStream = stream.filter (machine) -> machine.get('pnpId') and (machine.get('saved') is no)
       .flatMap (machine) ->
-        console.log "Saving machine #{machine.get('uuid')[0..6].toUpperCase()}"
         toSave =
           uuid: machine.get 'uuid'
           pnpId: machine.get 'pnpId'
@@ -134,8 +136,6 @@ Machine = Backbone.Model.extend
           details: _.omit machine.attributes, (val, key) ->
             key in ['saved','uuid','pnpId','name','type', 'image', 'details']
         Bacon.fromPromise(db.insert(toSave).into('machines')).map -> machine
-    saveStream.onValue (machine) ->
-        console.log "Successfully saved machine #{machine.get('uuid')[0...6].toUpperCase()}"
     saveStream.onError (err) -> console.error err.toString()
     return stream.doAction (m) -> delete m.attributes.saved
 
@@ -164,7 +164,6 @@ db.migrate.latest
         return
       machineList.remove machine
     ports = type.enumerate()
-    console.log type.longname(), ports.map (p) -> p.toJSON()
     ports.forEach addByPort
     ports.on 'add', addByPort
     ports.on 'remove', removeByPort

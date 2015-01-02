@@ -39,6 +39,7 @@ MachineSelectionView = Backbone.View.extend
     @onSync()
   onRemove: (model) ->
     card = @cards[model.id]
+    delete @cards[model.id]
     card.hide()
     @onSync()
   updateHeader: ->
