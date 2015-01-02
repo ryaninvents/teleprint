@@ -33,7 +33,6 @@ Printer3DView = Backbone.View.extend
     controls = new THREE.OrbitControls @camera, @$el[0]
     controls.damping = 0.2
     render = =>
-      # requestAnimationFrame render
       @renderer.render @scene, @camera
     controls.addEventListener 'change', render
     render()

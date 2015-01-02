@@ -70,13 +70,14 @@ Machine = Backbone.Model.extend
           codeName = @code.constructor.name
           @trigger 'error', "#{codeName}.#{method} is not a method"
   save: ->
+    detailFields = @port.constructor.options()
+    details = _.mapValues detailFields, (field) => @get field
     row =
       pnpId: @get 'pnpId'
       name: @get 'name'
       type: @get 'type'
       image: @get 'image'
-      details: _.omit @attributes, (val, key) ->
-        key in ['saved','uuid','pnpId','name','type','details','image']
+      details: details
     db('machines')
       .where('uuid','=',@get 'uuid')
       .update row
