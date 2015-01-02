@@ -77,7 +77,6 @@ Machine = Backbone.Model.extend
       image: @get 'image'
       details: _.omit @attributes, (val, key) ->
         key in ['saved','uuid','pnpId','name','type','details','image']
-    console.log 'saving', row
     db('machines')
       .where('uuid','=',@get 'uuid')
       .update row

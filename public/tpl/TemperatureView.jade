@@ -5,14 +5,20 @@
       | 21&deg;C
     .label
       | Target: #{' '}
-      .ui.inline.dropdown
+      .ui.inline.dropdown(data-field="extruder-temp")
         .text 205&deg;C
         i.dropdown.icon
         .menu
           .input
-            input(placeholder="Temperature")
+            input(type="number", placeholder="Temperature")
+          .divider
           .item ABS (230&deg;C)
           .item PLA (185&deg;C)
+          .divider
+          .input
+            .ui.toggle.checkbox
+              input(type="checkbox", name="extruder-power")
+              label Power
 .eight.wide.column(style='text-align:center;')
   .ui.statistic
     .label Print bed
@@ -20,5 +26,14 @@
     .label
       | Target: #{' '}
       .ui.inline.dropdown
-        .text 30&deg; C
+        .text 30&deg;C
         i.dropdown.icon
+          .menu
+            .input
+              input(type="number", placeholder="Temperature")
+            .item 50&deg;C
+            .divider
+            .input
+              .ui.toggle.checkbox
+                input(type="checkbox", name="bed-power")
+                label Power

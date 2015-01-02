@@ -24,6 +24,10 @@ SimMachine = Backbone.Model.extend
     @writeStream = new Bacon.Bus()
       .name 'machine.writeStream'
 
+    @writeStream.onError (err) ->
+      console.error "SimMachine error!"
+      console.error err.stack
+
     # Look for lines and split on newlines.
     @gCodeLines = Bacon.fromBinder (emit) =>
       partial = ''

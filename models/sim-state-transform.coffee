@@ -228,8 +228,8 @@ module.exports = (state, gcode) ->
       events = [new Bacon.Error e.toString()]
       console.error e
       console.error e.stack
-    events = events.map (e) ->
-      if e.isError?()
+    events = events.filter(_.identity).map (e) ->
+      if e.isError?() or e.isEnd?() or e.isNext?()
         e
       else
         new Bacon.Next(e)
