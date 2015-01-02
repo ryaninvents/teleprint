@@ -86,7 +86,6 @@ Machine = Backbone.Model.extend
     db('machines')
       .where('uuid','=',@get 'uuid')
       .update row
-      .then =>
       .catch (err) => @trigger 'err', err.stack.toString()
 
 ,
