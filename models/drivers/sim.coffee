@@ -1,13 +1,13 @@
 Bacon = require 'baconjs'
 
-Port = require '../port'
+Driver = require '../driver'
 SimMachine = require '../sim-machine'
 opts = require '../../options'
 
-ports = new Port.Collection()
+drivers = new Driver.Collection()
 
 module.exports =
-SimPort = Port.extend
+SimDriver = Driver.extend
   initialize: ->
     @machine = new SimMachine
 # Type of printer geometry: `cartesian`, `delta`, or `corexy`.
@@ -21,7 +21,7 @@ SimPort = Port.extend
     str.onValue (data) =>
       @trigger 'data', data
     str.onError (err) =>
-      console.error "Port error!", err.stack
+      console.error "Driver error!", err.stack
       @trigger 'error', err
   open: -> @trigger 'open'
   close: -> @trigger 'close'
@@ -32,7 +32,7 @@ SimPort = Port.extend
   flush: ->
 # ## Static methods
 ,
-  enumerate: -> ports
+  enumerate: -> drivers
   type: -> "sim"
   longname: -> "Simulated machine"
   description: ->
@@ -41,6 +41,6 @@ SimPort = Port.extend
 
 
 if opts.sim
-  ports.push new SimPort
+  drivers.push new SimDriver
     pnpId: "SimulatedMachine_09f41dde"
     comName: "/dev/fake"

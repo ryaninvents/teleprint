@@ -5,7 +5,7 @@ uuid = require 'node-uuid'
 _ = require 'lodash'
 path = require 'path'
 Bacon = require 'baconjs'
-Port = require './port'
+Driver = require './driver'
 require('../backbone.eventstreams')(Backbone)
 
 machinesPath = path.join __dirname,'../.machines'
@@ -22,23 +22,23 @@ module.exports =
 # # Class Machine
 Machine = Backbone.Model.extend
   initialize: ->
-    if @get('port')?
-      @port = @get 'port'
-      delete @attributes.port
-      @set 'pnpId', @port.get 'pnpId'
-      @port.on 'open', =>
+    if @get('driver')?
+      @driver = @get 'driver'
+      delete @attributes.driver
+      @set 'pnpId', @driver.get 'pnpId'
+      @driver.on 'open', =>
         @trigger 'open'
         @set 'connected', yes
-      @port.on 'close', =>
+      @driver.on 'close', =>
         @trigger 'close'
         @set 'connected', no
-      @port.on 'error', (e) =>
+      @driver.on 'error', (e) =>
         @trigger 'err', e.toString()
-      @port.on 'data', (data) =>
+      @driver.on 'data', (data) =>
         @trigger 'data', data
-      @port.on 'write', (data) => @trigger 'write', data
+      @driver.on 'write', (data) => @trigger 'write', data
 
-    saveOn = ['name','image'].concat _.keys @port.constructor.options()
+    saveOn = ['name','image'].concat _.keys @driver.constructor.options()
     @on 'change', () =>
       isect = _.intersection(saveOn, _.keys(@changedAttributes()))
       if isect.length
@@ -47,13 +47,13 @@ Machine = Backbone.Model.extend
     image: ''
   connect: ->
     unless @get 'connected'
-      @port.open()
+      @driver.open()
   disconnect: ->
     if @get 'connected'
-      @port.close()
+      @driver.close()
   write: (data) ->
     if @get 'connected'
-      @port.write data
+      @driver.write data
     else
       @trigger 'error', "Cannot write to machine; not connected"
   runMethod: (method, args) ->
@@ -75,7 +75,7 @@ Machine = Backbone.Model.extend
           codeName = @code.constructor.name
           @trigger 'error', "#{codeName}.#{method} is not a method"
   save: ->
-    detailFields = @port.constructor.options()
+    detailFields = @driver.constructor.options()
     details = _.mapValues detailFields, (field) => @get field
     row =
       pnpId: @get 'pnpId'
@@ -94,35 +94,35 @@ Machine = Backbone.Model.extend
 
 # ### lookup()
 #
-# Find a machine based on its port's pnpId, or
+# Find a machine based on its driver's pnpId, or
 # create a new machine if we haven't seen this
 # one before.
 #
 # Returns a stream that will emit a single
 # machine and then close.
-  lookup: (port) ->
+  lookup: (driver) ->
     withPnpMatch = (m) ->
-      m.port.get('pnpId') is port.get('pnpId')
+      m.driver.get('pnpId') is driver.get('pnpId')
 
     if m = machineList.find withPnpMatch
       return Bacon.once m
     stream = Bacon.fromPromise(
       db('machines').select('*')
-        .where pnpId: port.get('pnpId')
+        .where pnpId: driver.get('pnpId')
     ).map (results) ->
       if results.length
         row = results[0]
-        row.port = port
+        row.driver = driver
       else
         id = uuid.v4()
         row =
           uuid: id
-          pnpId: port.get 'pnpId'
+          pnpId: driver.get 'pnpId'
           name: "Machine #{id[0...6].toUpperCase()}"
           saved: no
-          type: port.constructor.type()
+          type: driver.constructor.type()
           image: ''
-          port: port
+          driver: driver
       machine = new Machine(row)
     saveStream = stream.filter (machine) -> machine.get('pnpId') and (machine.get('saved') is no)
       .flatMap (machine) ->
@@ -145,17 +145,17 @@ Machine.Collection = Backbone.Collection.extend
 
 machineList = new Machine.Collection
 
-portTypes = Port.types()
+portTypes = Driver.types()
 
 
 db.migrate.latest
   directory: path.join __dirname, '../migrations'
 .then ->
   portTypes.forEach (type) ->
-    addByPort = (p) ->
+    addByDriver = (p) ->
       Machine.lookup(p).onValue (machine) ->
         machineList.push machine
-    removeByPort = (p) ->
+    removeByDriver = (p) ->
       machine = (machineList.filter (machine) ->
         machine.get('pnpId') is p.get('pnpId')
       )[0]
@@ -163,9 +163,9 @@ db.migrate.latest
         return
       machineList.remove machine
     ports = type.enumerate()
-    ports.forEach addByPort
-    ports.on 'add', addByPort
-    ports.on 'remove', removeByPort
+    ports.forEach addByDriver
+    ports.on 'add', addByDriver
+    ports.on 'remove', removeByDriver
 
 process.on 'exit', ->
   console.log "Closing connections..."
