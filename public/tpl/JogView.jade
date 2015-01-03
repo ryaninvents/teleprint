@@ -3,14 +3,14 @@
     div(style="width:6em;height:8em;position:relative;margin: auto;")
       div.rot45
         div
-          a.big.teal.ui.button
+          a.big.teal.ui.button(data-action="jog", data-axis="+Y")
             i.fa.fa-arrow-up
-          a.big.blue.ui.button
+          a.big.blue.ui.button(data-action="jog", data-axis="+X")
             i.fa.fa-arrow-right
         div
-          a.big.blue.ui.button
+          a.big.blue.ui.button(data-action="jog", data-axis="-X")
             i.fa.fa-arrow-left
-          a.big.teal.ui.button
+          a.big.teal.ui.button(data-action="jog", data-axis="-Y")
             i.fa.fa-arrow-down
     | Jog X/Y by #{' '}
     select.ui.inline.dropdown
@@ -21,10 +21,10 @@
   .column(style='text-align:center;')
     div(style='height:8em;')
       div(style='margin-bottom:0.35em;')
-        a.big.purple.ui.button
+        a.big.purple.ui.button(data-action="jog", data-axis="+Z")
           i.fa.fa-arrow-up
       div
-        a.big.purple.ui.button
+        a.big.purple.ui.button(data-action="jog", data-axis="-Z")
           i.fa.fa-arrow-down
     | Jog Z by #{' '}
     select.ui.inline.dropdown
