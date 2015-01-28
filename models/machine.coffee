@@ -6,8 +6,11 @@ _ = require 'lodash'
 path = require 'path'
 Bacon = require 'baconjs'
 Driver = require './driver'
+DeltaBot = require '../math/deltabot'
+
 require('../backbone.eventstreams')(Backbone)
 
+# Set up the database.
 machinesPath = path.join __dirname,'../.machines'
 dbPath = path.join machinesPath, 'machines.sqlite'
 sh.mkdir '-p', machinesPath
@@ -22,6 +25,7 @@ module.exports =
 # # Class Machine
 Machine = Backbone.Model.extend
   initialize: ->
+    @details ?= {}
     if @get('driver')?
       @driver = @get 'driver'
       delete @attributes.driver
@@ -38,24 +42,41 @@ Machine = Backbone.Model.extend
         @trigger 'data', data
       @driver.on 'write', (data) => @trigger 'write', data
 
+    # TODO break this out; delta stuff shouldn't be hardcoded
+    @deltaBot = new DeltaBot(details)
+
     saveOn = ['name','image'].concat _.keys @driver.constructor.options()
     @on 'change', () =>
       isect = _.intersection(saveOn, _.keys(@changedAttributes()))
       if isect.length
         @save()
+    # TODO break this out; delta stuff shouldn't be hardcoded
+    @on 'change:details', =>
+      @deltaBot.armLength = @details.armLength
+      @deltaBot.bedRadius = @details.bedRadius
+
+
   defaults: ->
     image: ''
+
+
   connect: ->
     unless @get 'connected'
       @driver.open()
+
+
   disconnect: ->
     if @get 'connected'
       @driver.close()
+
+
   write: (data) ->
     if @get 'connected'
       @driver.write data
     else
       @trigger 'error', "Cannot write to machine; not connected"
+
+
   runMethod: (method, args) ->
     switch method
       when 'write'
@@ -74,6 +95,8 @@ Machine = Backbone.Model.extend
         else
           codeName = @code.constructor.name
           @trigger 'error', "#{codeName}.#{method} is not a method"
+
+
   save: ->
     detailFields = @driver.constructor.options()
     details = _.mapValues detailFields, (field) => @get field
@@ -91,6 +114,7 @@ Machine = Backbone.Model.extend
 ,
 # ## Static methods
   listVisible: -> machineList
+
 
 # ### lookup()
 #
@@ -147,10 +171,11 @@ machineList = new Machine.Collection
 
 portTypes = Driver.types()
 
-
+# Make sure our database is up-to-date.
 db.migrate.latest
   directory: path.join __dirname, '../migrations'
 .then ->
+  # Find which machines are plugged in already on startup.
   portTypes.forEach (type) ->
     addByDriver = (p) ->
       Machine.lookup(p).onValue (machine) ->
@@ -167,6 +192,10 @@ db.migrate.latest
     ports.on 'add', addByDriver
     ports.on 'remove', removeByDriver
 
+# Close any connections to machines on process exit.
+# Not great; process exit prevents any callbacks, so any async cleanup
+# won't happen. However, having this here does make me feel good about
+# myself.
 process.on 'exit', ->
   console.log "Closing connections..."
   for m in machineList.models
