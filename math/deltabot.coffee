@@ -32,7 +32,13 @@ class DeltaBot
     {
       @armLength
       @bedRadius
+      @maxPrintRadius
+      @endstopOffsets
     } = params
+    @armLength ?= 250
+    @bedRadius ?= 124
+    @maxPrintRadius ?= 90
+    @endstopOffsets ?= []
 
   toString: -> "DeltaBot(#{@armLength}mm arms/ #{@bedRadius}mm radius)"
 
