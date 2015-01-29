@@ -22,7 +22,10 @@ ENDSTOP_OFFSET_MULTIPLIER = 1
 
 # Takes a two 2-element arrays and returns highest and lowest values found.
 # Used in `reduce()` further on.
-minMax = (a,b) -> [Math.min(a[0],b[0]), Math.max(a[1],b[1])]
+minMaxR = (a,b) -> [Math.min(a[0],b[0]), Math.max(a[1],b[1])]
+
+# Takes a list of numbers and returns [min, max].
+minMax = (list) -> list.map((n) -> [n,n]).reduce minMaxR
 
 # ### Input events
 #
@@ -134,19 +137,16 @@ module.exports = (inputStream, bot) ->
             point: endstop
           return yes
 
-        # Test if endstop readings are "equal"; i.e. within an acceptable range.
-        endstopReadingsAreEqual = ->
-          [min, max] = state.endstops.map (endstop) ->
-            m = to_mm(endstop.dial)
-            [m, m]
-          .reduce minMax
+        # Test if endstop readings are within an acceptable range.
+        endstopReadingsAreAcceptable = ->
+          [min, max] = minMax state.endstops.map (endstop) -> to_mm(endstop.dial)
           return (max - min) <= state.epsilon
 
         # Update our offset guesses, upload them to the printer, and delete our dial data.
         invalidateEndstopData = ->
           sums = state.endstops.map (endstop) ->
             endstop.sum = endstop.z + to_mm(endstop.dial) + ENDSTOP_OFFSET_MULTIPLIER*endstop.offset
-          [min, max] = sums.map((s) -> [s, s]).reduce minMax
+          [min, max] = minMax sums
           mid = (min + max) / 2
           endstops.forEach (endstop) ->
             endstop.offset += mid
@@ -172,12 +172,9 @@ module.exports = (inputStream, bot) ->
             point: touchPt
           return yes
 
-        # Test if plate touch readings are "equal"; i.e. within an acceptable range.
-        plateTouchReadingsAreEqual = ->
-          [min, max] = state.plateTouches.map (touchPt) ->
-            m = to_mm(touchPt.dial)
-            [m, m]
-          .reduce minMax
+        # Test if plate touch readings are within an acceptable range.
+        plateTouchReadingsAreAcceptable = ->
+          [min, max] = minMax state.plateTouches.map (touchPt) -> to_mm(touchPt.dial)
           return (max - min) <= state.epsilon
 
         # Update our parameter guesses, upload them to the printer, and delete our dial data.
@@ -209,13 +206,13 @@ module.exports = (inputStream, bot) ->
         if handleNewEvent() is BREAK_EARLY then return state
         if needEndstopData()
           return state
-        unless endstopReadingsAreEqual()
+        unless endstopReadingsAreAcceptable()
           invalidateEndstopData()
           needEndstopData()
           return state
         if needPlateTouchData()
           return state
-        unless plateTouchReadingsAreEqual()
+        unless plateTouchReadingsAreAcceptable()
           invalidatePlateTouchData()
           needPlateTouchData()
           return state
