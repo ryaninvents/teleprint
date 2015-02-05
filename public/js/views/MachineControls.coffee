@@ -5,6 +5,7 @@ _ = require 'lodash'
 JogView = require './JogView.coffee'
 TemperatureView = require './TemperatureView.coffee'
 Printer3DView = require './Printer3DView.coffee'
+CalibrationDialog = require './CalibrationDialog.coffee'
 
 tpl = require '../../tpl/MachineControls.jade'
 
@@ -21,6 +22,9 @@ MachineControls = Backbone.View.extend
 
     @printer3DView = new Printer3DView model: @model
     @$('[data-view="printer3D"]').html @printer3DView.render().$el
+
+    @$('[data-action="calibrate"]').click =>
+      new CalibrationDialog().show()
 
     $gcodeInput = @$('[data-element="gcode-input"]')
     $gcodeInput.asEventStream('keyup')

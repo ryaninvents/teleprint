@@ -1,0 +1,17 @@
+.ui.modal
+  i.close.icon
+  .header(data-hook='title') Calibrate
+  .content(data-hook='content').ui.form
+    .ui.inverted.dimmer
+      .large.ui.text.loader Moving...
+    .field
+      label.
+        When the printer stops moving, enter the measurement indicated on the dial
+        into the box below, or click "Not touching" if the dial indicator isn't
+        touching the print bed.
+      .fluid.ui.right.action.input
+        input(type='number', min=0, step=1e-3, placeholder='Measurement')
+        .ui.button(data-hook='units') in
+    .field(style='text-align:right;')
+      a.orange.ui.button(data-hook='not-touching') Not touching
+      a.positive.ui.button(data-hook='ok') OK

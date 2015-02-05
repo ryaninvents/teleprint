@@ -220,5 +220,6 @@ module.exports = (inputStream, bot) ->
         return state
       )()
     catch e
-      return [state, [Bacon.Error e]]
+      events = [Bacon.Error e]
+      state
     [newState, events]

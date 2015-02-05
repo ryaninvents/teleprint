@@ -42,6 +42,12 @@ Machine = Backbone.Model.extend
     @socket().emit 'method', 'connect'
   sendChanges: ->
     @socket().emit 'change', @changedAttributes()
+  method: (methodName) -> () =>
+    args = [].slice.apply arguments
+    args.unshift methodName
+    args.unshift 'method'
+    socket = @socket()
+    socket.emit.apply socket, args
 ,
   getByID: (id) ->
     Machine.list.find (m) -> m.id is id

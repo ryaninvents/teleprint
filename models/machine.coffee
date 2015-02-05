@@ -7,6 +7,7 @@ path = require 'path'
 Bacon = require 'baconjs'
 Driver = require './driver'
 DeltaBot = require '../math/deltabot'
+deltaCalib = require '../math/delta-calib-state-machine'
 
 require('../backbone.eventstreams')(Backbone)
 
@@ -43,14 +44,21 @@ Machine = Backbone.Model.extend
       @driver.on 'write', (data) => @trigger 'write', data
 
     # TODO break this out; delta stuff shouldn't be hardcoded
-    @deltaBot = new DeltaBot(details)
+    @deltaBot = new DeltaBot(@details)
+    # TODO the calibration thingy should be wrapped up in the DeltaBot itself
+    @deltaCalibStream = new Bacon.Bus()
+    @deltaCalib = deltaCalib(@deltaCalibStream, @deltaBot)
+    # When our calibration routine emits an event, trigger that event on
+    # this Machine.
+    @deltaCalib.onValue (event) =>
+      @trigger event.type, event
 
     saveOn = ['name','image'].concat _.keys @driver.constructor.options()
     @on 'change', () =>
       isect = _.intersection(saveOn, _.keys(@changedAttributes()))
       if isect.length
         @save()
-    # TODO break this out; delta stuff shouldn't be hardcoded
+    # TODO break this out; delta stuff shouldn't be hardcoded here
     @on 'change:details', =>
       @deltaBot.armLength = @details.armLength
       @deltaBot.bedRadius = @details.bedRadius
@@ -86,7 +94,12 @@ Machine = Backbone.Model.extend
       when 'disconnect', 'close'
         @disconnect()
       else
-        if _.isFunction @code?[method]
+        # TODO break this out into another package
+        if method in ['calibration:begin','measurement:dial']
+          event = args[0] ? {}
+          event.type ?= method
+          @deltaCalibStream.push event
+        else if _.isFunction @code?[method]
           @code[method].apply @transform, args.concat (err, code) =>
             if err
               console.error err.stack
