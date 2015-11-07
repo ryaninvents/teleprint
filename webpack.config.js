@@ -21,7 +21,7 @@ module.exports = {
     })
   ],
   resolve: {
-    extensions: ['', '.js']
+    extensions: ['', '.js', '.coffee', '.coffee.md']
   },
   module: {
     loaders: [{
@@ -41,6 +41,8 @@ module.exports = {
       test: /\.scss$/,
       loader: 'style!css!sass'
     },
+    { test: /\.coffee$/, loader: "coffee-loader" },
+    { test: /\.(coffee\.md|litcoffee)$/, loader: "coffee-loader?literate" },
     {
       test: /\.less$/,
       loader: 'style!css!less'
