@@ -7,25 +7,20 @@ import '../semantic/dist/components/icon.css' ;
 
 const MENU_TPL = [
 {
-  key: 'controls',
-  label: 'Controls',
-  icon: 'dashboard'
+  key: 'file',
+  label: 'File',
+  icon: 'folder open'
 },
 {
-  key: 'model',
-  label: 'Model',
-  icon: 'cube'
+  key: 'view',
+  label: 'View',
+  icon: 'unhide'
 },
 {
-  key: 'slicing',
-  label: 'Slicing',
-  icon: 'cut'
+  key: 'machines',
+  label: 'Machines',
+  icon: 'sitemap'
 },
-{
-  key: 'settings',
-  label: 'Settings',
-  icon: 'configure'
-}
 ];
 
 export default class MainMenu extends Component {
@@ -37,16 +32,14 @@ export default class MainMenu extends Component {
   }
   render() {
     const {activeItem} = this.state;
-    return (<Menu color="red"
-                  pointing={true}
+    return (<Menu size="small"
                   fixed={true}
-                  icons="labeled"
-                  color="red"
+                  borderless={true}
                   side="top">
         {
           MENU_TPL.map(item => <Item
               type="link"
-              active={activeItem === item.key}
+              active={this.props.select && (activeItem === item.key)}
               key={item.key}
               onClick={() => this.handleItemClick(item.key)}>
               <i className={`${item.icon} icon`} /> {item.label}

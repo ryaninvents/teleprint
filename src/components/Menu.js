@@ -7,6 +7,9 @@ const classNameDescriptors = {
   vertical(_) {
     return _.props.direction === 'vertical';
   },
+  borderless(_) {
+    return _.props.borderless === 'true';
+  },
   pointing(_) {
     return _.props.pointing;
   },
@@ -24,6 +27,9 @@ const classNameDescriptors = {
   },
   top(_) {
     return _.props.side === "top";
+  },
+  small(_) {
+    return _.props.size === "small";
   }
 };
 
