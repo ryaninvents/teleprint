@@ -69,8 +69,12 @@
   "dependencies": {
     "coffee-loader": "^0.7.2",
     "history": "^1.12.4",
+    "koa": "^1.1.2",
+    "koa-route": "^2.4.2",
+    "koa-websocket": "^1.1.0",
     "material-ui": "^0.13.1",
     "node-sass": "^3.4.1",
+    "node-uuid": "^1.4.3",
     "react": "^0.14.0",
     "react-addons-create-fragment": "^0.14.2",
     "react-addons-pure-render-mixin": "^0.14.2",
@@ -83,6 +87,7 @@
     "redux": "^3.0.2",
     "redux-logger": "^2.0.3",
     "redux-promise": "^0.5.0",
-    "redux-thunk": "^1.0.0"
+    "redux-thunk": "^1.0.0",
+    "serialport": "^2.0.2"
   }
 }
