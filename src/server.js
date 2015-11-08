@@ -2,20 +2,14 @@ import koa from 'koa';
 import route from 'koa-route';
 import websockify from 'koa-websocket';
 
+import store, {appInit} from './server/store';
+
 const app = websockify(koa());
 
-// Note it's app.ws.use and not app.use
-app.ws.use(route.all('/test/:id', function *(next) {
-  // `this` is the regular koa context created from the `ws` onConnection `socket.upgradeReq` object.
-  // the websocket is added to the context on `this.websocket`.
-  this.websocket.send('Hello World');
-  this.websocket.on('message', function(message) {
-    // do something with the message from client
-    console.log(message);
-  });
-  // yielding `next` will pass the context (this) on to the next ws middleware
-  yield next;
-}));
+process.nextTick(() => store.dispatch(appInit(app)));
 
+const PORT = process.env.PORT || 9600;
 
-app.listen(process.env.PORT || 3001);
+app.listen(PORT);
+
+console.log(`Server listening on port ${PORT}`);

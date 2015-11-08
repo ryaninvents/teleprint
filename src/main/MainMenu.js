@@ -45,6 +45,12 @@ export default class MainMenu extends Component {
               <i className={`${item.icon} icon`} /> {item.label}
             </Item>)
         }
+        <div className="right menu">
+          <Item>
+            <i className="disk outline icon" />
+            Server online
+          </Item>
+        </div>
       </Menu>);
   }
   handleItemClick(activeItem) {

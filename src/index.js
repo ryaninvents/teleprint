@@ -9,6 +9,7 @@ import {useBasename} from 'history';
 
 import configureStore from './store/configureStore';
 import routes from './routes';
+import {APP_INIT} from './main/mainActions';
 
 import Main from './main/Main';
 
@@ -21,5 +22,8 @@ ReactDOM.render(
   <Provider store={store}>
     <Router history={history} children={routes} />
   </Provider>,
-  document.getElementById('root')
+  document.getElementById('root'),
+  function () {
+    store.dispatch({type: APP_INIT});
+  }
 );

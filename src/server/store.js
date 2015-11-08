@@ -2,16 +2,18 @@ import {createStore, applyMiddleware} from 'redux';
 
 import reducer from './reducer';
 import {serialMiddleware} from '../networking/serial';
+import {wsServerMiddleware} from '../networking/wsServer';
+
+import {APP_INIT} from '../main/mainActions';
 
 const middlewares = [
+  wsServerMiddleware,
   serialMiddleware
 ];
 
 const store = applyMiddleware(...middlewares)(createStore)(reducer);
 
 export default store;
-
-export const APP_INIT = Symbol('teleprint/app-init');
 
 export function appInit(app) {
   return {

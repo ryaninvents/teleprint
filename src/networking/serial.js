@@ -1,30 +1,30 @@
 import serialPort, {SerialPort} from 'serialport';
 import uuid from 'node-uuid';
 
-export const SERIAL_PORT_CONNECT         = Symbol('teleprint/serialport/connect');
-export const SERIAL_PORT_CONNECT_SUCCESS = Symbol('teleprint/serialport/connect/success');
-export const SERIAL_PORT_CONNECT_FAILURE = Symbol('teleprint/serialport/connect/failure');
+export const SERIAL_PORT_CONNECT         = ('teleprint/serialport/connect');
+export const SERIAL_PORT_CONNECT_SUCCESS = ('teleprint/serialport/connect/success');
+export const SERIAL_PORT_CONNECT_FAILURE = ('teleprint/serialport/connect/failure');
 
-export const SERIAL_PORT_WRITE           = Symbol('teleprint/serialport/write');
-export const SERIAL_PORT_WRITE_SUCCESS   = Symbol('teleprint/serialport/write/success');
-export const SERIAL_PORT_WRITE_FAILURE   = Symbol('teleprint/serialport/write/failure');
+export const SERIAL_PORT_WRITE           = ('teleprint/serialport/write');
+export const SERIAL_PORT_WRITE_SUCCESS   = ('teleprint/serialport/write/success');
+export const SERIAL_PORT_WRITE_FAILURE   = ('teleprint/serialport/write/failure');
 
-export const SERIAL_PORT_DATA_RECEIVED   = Symbol('teleprint/serialport/data-received');
+export const SERIAL_PORT_DATA_RECEIVED   = ('teleprint/serialport/data-received');
 
-export const SERIAL_PORT_DRAIN           = Symbol('teleprint/serialport/drain');
-export const SERIAL_PORT_DRAIN_SUCCESS   = Symbol('teleprint/serialport/drain/success');
-export const SERIAL_PORT_DRAIN_FAILURE   = Symbol('teleprint/serialport/drain/failure');
+export const SERIAL_PORT_DRAIN           = ('teleprint/serialport/drain');
+export const SERIAL_PORT_DRAIN_SUCCESS   = ('teleprint/serialport/drain/success');
+export const SERIAL_PORT_DRAIN_FAILURE   = ('teleprint/serialport/drain/failure');
 
-export const SERIAL_PORT_LIST            = Symbol('teleprint/serialport/list');
-export const SERIAL_PORT_LIST_SUCCESS    = Symbol('teleprint/serialport/list/success');
-export const SERIAL_PORT_LIST_FAILURE    = Symbol('teleprint/serialport/list/failure');
+export const SERIAL_PORT_LIST            = ('teleprint/serialport/list');
+export const SERIAL_PORT_LIST_SUCCESS    = ('teleprint/serialport/list/success');
+export const SERIAL_PORT_LIST_FAILURE    = ('teleprint/serialport/list/failure');
 
-export const SERIAL_PORT_DISCONNECT         = Symbol('teleprint/serialport/disconnect');
-export const SERIAL_PORT_DISCONNECT_SUCCESS = Symbol('teleprint/serialport/disconnect/success');
-export const SERIAL_PORT_DISCONNECT_FAILURE = Symbol('teleprint/serialport/disconnect/failure');
-export const SERIAL_PORT_DISCONNECTED_VIA_DEVICE = Symbol('teleprint/serialport/disconnected-via-device');
+export const SERIAL_PORT_DISCONNECT         = ('teleprint/serialport/disconnect');
+export const SERIAL_PORT_DISCONNECT_SUCCESS = ('teleprint/serialport/disconnect/success');
+export const SERIAL_PORT_DISCONNECT_FAILURE = ('teleprint/serialport/disconnect/failure');
+export const SERIAL_PORT_DISCONNECTED_VIA_DEVICE = ('teleprint/serialport/disconnected-via-device');
 
-export const SERIAL_PORT_ERROR = Symbol('teleprint/serialport/error');
+export const SERIAL_PORT_ERROR = ('teleprint/serialport/error');
 
 const PORTS = {};
 
@@ -33,7 +33,7 @@ export const serialMiddleware = store => next => action => {
   next(action);
 
   switch (action.type) {
-    case SERIAL_PORT_CONNECT:
+    case SERIAL_PORT_CONNECT: {
       const {portID} = action;
       const port = new SerialPort(action.port, action.options);
       port.on('open', (err) => {
@@ -59,16 +59,17 @@ export const serialMiddleware = store => next => action => {
         });
       });
       break;
-    case SERIAL_PORT_WRITE:
+    }
+    case SERIAL_PORT_WRITE: {
       const {portID, writeRequestID} = action;
       const portInfo = PORTS[portID];
       if (!portInfo) {
-        store.dispatch(serialPortWriteFailure(writeRequestID, new Error(`No port with ID ${portID}`));
+        store.dispatch(serialPortWriteFailure(writeRequestID, new Error(`No port with ID ${portID}`)));
         break;
       }
       const {port} = portInfo;
       if (!port.isOpen()) {
-        store.dispatch(serialPortWriteFailure(writeRequestID, new Error(`Port ${portID} is not open for writing`));
+        store.dispatch(serialPortWriteFailure(writeRequestID, new Error(`Port ${portID} is not open for writing`)));
         break;
       }
       port.write(action.data, (error) => {
@@ -78,7 +79,8 @@ export const serialMiddleware = store => next => action => {
         return store.dispatch(serialPortWriteSuccess(writeRequestID));
       });
       break;
-    case SERIAL_PORT_DRAIN:
+    }
+    case SERIAL_PORT_DRAIN: {
       const {portID, drainRequestID} = action;
       const portInfo = PORTS[portID];
       if (!portInfo) {
@@ -96,7 +98,9 @@ export const serialMiddleware = store => next => action => {
         }
         return store.dispatch(serialPortDrainSuccess(drainRequestID));
       });
-    case SERIAL_PORT_LIST:
+      break;
+    }
+    case SERIAL_PORT_LIST: {
       serialPort.list((err, ports) => {
         if (err) {
           store.dispatch(serialPortListFailure(err));
@@ -104,6 +108,7 @@ export const serialMiddleware = store => next => action => {
         store.dispatch(serialPortListSuccess(ports));
       });
       break;
+    }
     default: break;
   }
 };

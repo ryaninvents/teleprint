@@ -1,38 +1,46 @@
 import uuid from 'node-uuid';
 
-import {APP_INIT} from '../server/store';
+import {APP_INIT} from '../main/mainActions';
 
-export const WS_CLIENT_CONNECTED     = Symbol('teleprint/ws-server/client/connected');
-export const WS_CLIENT_DISCONNECTED  = Symbol('teleprint/ws-server/client/disconnected');
-export const WS_CLIENT_MESSAGE       = Symbol('teleprint/ws-server/client/message');
-export const WS_MESSAGE_SEND         = Symbol('teleprint/ws-server/message-send');
-export const WS_MESSAGE_SEND_SUCCESS = Symbol('teleprint/ws-server/message-send/success');
-export const WS_MESSAGE_SEND_FAILURE = Symbol('teleprint/ws-server/message-send/failure');
-export const WS_DISCONNECT           = Symbol('teleprint/ws-server/disconnect');
-export const WS_DISCONNECT_SUCCESS   = Symbol('teleprint/ws-server/disconnect/success');
-export const WS_DISCONNECT_FAILURE   = Symbol('teleprint/ws-server/disconnect/failure');
+export const WS_CLIENT_CONNECTED     = ('teleprint/ws-server/client/connected');
+export const WS_CLIENT_DISCONNECTED  = ('teleprint/ws-server/client/disconnected');
+export const WS_CLIENT_MESSAGE       = ('teleprint/ws-server/client/message');
+export const WS_MESSAGE_SEND         = ('teleprint/ws-server/message-send');
+export const WS_MESSAGE_SEND_SUCCESS = ('teleprint/ws-server/message-send/success');
+export const WS_MESSAGE_SEND_FAILURE = ('teleprint/ws-server/message-send/failure');
+export const WS_DISCONNECT           = ('teleprint/ws-server/disconnect');
+export const WS_DISCONNECT_SUCCESS   = ('teleprint/ws-server/disconnect/success');
+export const WS_DISCONNECT_FAILURE   = ('teleprint/ws-server/disconnect/failure');
 
 const SOCKETS = {};
 
 export const wsServerMiddleware = store => next => action => {
   next(action);
   switch (action.type) {
-    case APP_INIT:
+    case APP_INIT: {
+      console.log('app initting');
       const {app} = action;
       app.ws.use(function *(next) {
         const socketID = uuid.v1();
         const {websocket} = this;
         SOCKETS[socketID] = websocket;
         store.dispatch(wsClientConnected(socketID));
+        console.log('client connected!');
         websocket.on('message', (message, flags) => {
           store.dispatch(wsClientMessage(socketID, message, flags));
+          try {
+            console.log(JSON.parse(message));
+          } catch (err) {
+            console.error(err);
+          }
         });
         websocket.on('close', () => {
           store.dispatch(wsClientDisconnected(socketID));
         });
       });
       break;
-    case WS_MESSAGE_SEND:
+    }
+    case WS_MESSAGE_SEND: {
       const {socketID, messageID, message, flags} = action;
       const websocket = SOCKETS[socketID];
       if (!websocket) {
@@ -46,7 +54,8 @@ export const wsServerMiddleware = store => next => action => {
         store.dispatch(wsMessageSendSuccess(messageID));
       });
       break;
-    case WS_DISCONNECT:
+    }
+    case WS_DISCONNECT: {
       const {socketID, disconnectRequestID} = action;
       const websocket = SOCKETS[socketID];
       if (!websocket) {
@@ -63,6 +72,13 @@ export const wsServerMiddleware = store => next => action => {
         store.dispatch(wsDisconnectFailure(disconnectRequestID, error));
       }
       break;
+    }
+    default: {
+      const serializedAction = JSON.stringify(action);
+      Object.keys(SOCKETS).forEach(socket => {
+        socket.send(serializedAction);
+      });
+    }
   }
 };
 

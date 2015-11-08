@@ -4,6 +4,7 @@ import thunkMiddleware from 'redux-thunk';
 import promiseMiddleware from 'redux-promise';
 import createLogger from 'redux-logger';
 import rootReducer from '../reducers';
+import {wsClientMiddleware} from '../networking/wsClient';
 
 
 const loggerMiddleware = createLogger({
@@ -17,14 +18,12 @@ let createStoreWithMiddleware;
 if (typeof __DEVTOOLS__ !== 'undefined' && __DEVTOOLS__) {
   createStoreWithMiddleware = 
     applyMiddleware(
-      thunkMiddleware, 
-      promiseMiddleware, 
-      loggerMiddleware
+        wsClientMiddleware,
+        loggerMiddleware
     )(createStore);
 } else {
   createStoreWithMiddleware = applyMiddleware(
-    thunkMiddleware,
-    promiseMiddleware
+      wsClientMiddleware
   )(createStore);
 }
 
