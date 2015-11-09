@@ -44,7 +44,7 @@ export default class MainMenu extends Component {
               active={this.props.select && (activeItem === item.key)}
               key={item.key}
               onClick={() => this.handleItemClick(item.key)}>
-              <i className={`${item.icon} icon`} /> {item.label}
+              {item.label}
             </Item>)
         }
         <div className="right menu">

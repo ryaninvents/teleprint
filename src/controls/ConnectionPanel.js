@@ -1,11 +1,18 @@
 import React, {Component} from 'react';
 
 import Segment from '../components/Segment';
+import Dropdown from '../components/Dropdown';
 
 import '../semantic/dist/components/form.css';
-import '../semantic/dist/components/dropdown.css';
 
 export default class ConnectionPanel extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      port: '/dev/ttyACM0',
+      ports: ['/dev/ttyACM0', '/dev/ttyACM1']
+    };
+  }
   render() {
     return (<div className="ui segments">
       <Segment>
@@ -26,10 +33,8 @@ export default class ConnectionPanel extends Component {
               <label>Port</label>
             </div>
             <div className="twelve wide field">
-              <div className="ui dropdown">
-                <div className="text">/dev/ttyUSB0</div>
-                <i className="dropdown icon"/>
-              </div>
+              <Dropdown options={this.state.ports} selected={this.state.port}
+                onChange={(port) => this.setState({port})} />
             </div>
           </div>
           <div className="inline fields">

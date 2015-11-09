@@ -15,6 +15,7 @@ export const WS_DISCONNECT_FAILURE   = ('teleprint/ws-client/disconnect/failure'
 import {APP_INIT} from '../main/mainActions';
 
 let socket = null;
+let reconnectInterval = null;
 
 const WS_PROTOCOL = document.location.protocol === 'https' ? 'wss:' : 'ws:';
 const WS_URL = window.WS_URL || `${WS_PROTOCOL}//${document.location.hostname}:${window.WS_PORT || 9600}`;
@@ -24,12 +25,15 @@ export const wsClientMiddleware = store => next => action => {
   switch (action.type) {
     case APP_INIT: {
       store.dispatch(wsConnect());
-      setTimeout(() => store.dispatch({type: 'foo/bar'}), 2000);
       break;
     }
     case WS_CONNECT: {
       const ws = new WebSocket(WS_URL);
       ws.onopen = () => {
+        if (reconnectInterval) {
+          clearInterval(reconnectInterval);
+          reconnectInterval = null;
+        }
         window.ws = socket = ws;
         store.dispatch(wsConnectSuccess());
       }
@@ -39,12 +43,14 @@ export const wsClientMiddleware = store => next => action => {
       ws.onerror = () => {
         if (ws.readyState === WebSocket.CLOSED) {
           store.dispatch(wsDisconnectSuccess());
-          setTimeout(() => store.dispatch(wsConnect()), 5000);
+          if (!reconnectInterval)
+            reconnectInterval = setInterval(() => store.dispatch(wsConnect()), 5000);
         }
       }
       ws.onclose = () => {
         store.dispatch(wsDisconnectSuccess());
-        setTimeout(() => store.dispatch(wsConnect()), 5000);
+        if (!reconnectInterval)
+          reconnectInterval = setInterval(() => store.dispatch(wsConnect()), 5000);
       }
     }
     default:
