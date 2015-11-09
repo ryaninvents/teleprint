@@ -48,10 +48,10 @@ const RINGS = [
 const ANGLES = [45, 135, 225, 315];
 
 const COLORS = {
-  45:  red,
-  135: yellow,
-  225: orange,
-  315: olive
+  [45]:  red,
+  [135]: yellow,
+  [225]: orange,
+  [315]: olive
 };
 
 function colorForAngleAndRadius(a, r) {
@@ -75,11 +75,34 @@ class XYJogPad extends Component {
   }
 }
 
+const Z_COLORS = {
+  [1]: green,
+  [-1]: teal
+};
+
+function colorForZ(signum, r) {
+  const baseColor = Z_COLORS[signum] || grey;
+  const color = lighten(baseColor, -((50 - r) / 3)).map(n => Math.round(n));
+  return `rgba(${color.join(',')})`;
+}
+
+class ZJog extends Component {
+  render() {
+    return (<g>
+      {
+        flatten([1, -1].map(signum => [40, 28, 16].map(r => (
+          <rect x="110" y={50 + signum * r - 6} width="20" height="12" fill={colorForZ(signum, r)}/>
+        ))))
+      }
+    </g>);
+  }
+}
+
 export default class JogPad extends Component {
   render() {
     return (<svg viewBox="-1 -1 131 101">
       <XYJogPad />
-      <rect x="110" y="0" width="20" height="100" fill="teal" />
+      <ZJog />
     </svg>);
   }
 }

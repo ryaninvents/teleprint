@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 
+import ConnectionIndicator from './ConnectionIndicator';
+
 import Menu from '../components/Menu';
 import Item from '../components/Item';
 
@@ -46,10 +48,7 @@ export default class MainMenu extends Component {
             </Item>)
         }
         <div className="right menu">
-          <Item>
-            <i className="disk outline icon" />
-            Server online
-          </Item>
+          <ConnectionIndicator />
         </div>
       </Menu>);
   }

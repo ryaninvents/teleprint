@@ -31,9 +31,20 @@ export const wsClientMiddleware = store => next => action => {
       const ws = new WebSocket(WS_URL);
       ws.onopen = () => {
         window.ws = socket = ws;
+        store.dispatch(wsConnectSuccess());
       }
       ws.onmessage = (message) => {
         console.info(JSON.parse(message.data));
+      }
+      ws.onerror = () => {
+        if (ws.readyState === WebSocket.CLOSED) {
+          store.dispatch(wsDisconnectSuccess());
+          setTimeout(() => store.dispatch(wsConnect()), 5000);
+        }
+      }
+      ws.onclose = () => {
+        store.dispatch(wsDisconnectSuccess());
+        setTimeout(() => store.dispatch(wsConnect()), 5000);
       }
     }
     default:
@@ -46,5 +57,17 @@ export const wsClientMiddleware = store => next => action => {
 export function wsConnect() {
   return {
     type: WS_CONNECT
+  };
+}
+
+export function wsConnectSuccess() {
+  return {
+    type: WS_CONNECT_SUCCESS
+  };
+}
+
+export function wsDisconnectSuccess() {
+  return {
+    type: WS_DISCONNECT_SUCCESS
   };
 }

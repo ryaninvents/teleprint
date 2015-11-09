@@ -1,5 +1,7 @@
 import { combineReducers } from 'redux';
 
-export default function (state={}, action) {
-  return state;
-}
+import serverConnection from './server/serverConnectionReducer';
+
+export default combineReducers({
+  serverConnection
+});
