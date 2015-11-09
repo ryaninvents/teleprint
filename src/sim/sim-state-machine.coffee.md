@@ -172,6 +172,29 @@ This is deprecated, but I haven't found documentation on what's supplanting it, 
 
 ### M105: Get current extruder temp
 
+The following is output from Pronterface talking to a Lulzbot.
+>```
+SENT: M105
+RECV: ok T:24.5 /0.0 B:27.7 /0.0 T0:24.5 /0.0 @:0 B@:0
+SENT: M105
+RECV: ok T:24.4 /0.0 B:27.7 /0.0 T0:24.4 /0.0 @:0 B@:0
+```
+
+After setting the nozzle temp to 190:
+>```
+SENT: M105
+RECV: ok T:35.2 /190.0 B:27.1 /0.0 T0:35.2 /190.0 @:110 B@:0
+SENT: M105
+RECV: ok T:40.3 /190.0 B:27.3 /0.0 T0:40.3 /190.0 @:110 B@:0
+```
+
+The pattern seems to be:
+```
+T:$NOZZLE_TEMP /$NOZZLE_TARGET B:$BED_TEMP /$BED_TARGET T0:$NOZZLE_TEMP /$NOZZLE_TARGET @:$NOZZLE_PWM B@:$BED_PWM
+```
+
+TODO: verify this before the software relies on it.
+
       M105: (send) -> -> send "ok T:#{@nozzleTemp} B:#{@bedTemp}"
 
 ### M109: Set extruder temp and wait
