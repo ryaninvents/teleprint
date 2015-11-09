@@ -17,7 +17,7 @@ import {APP_INIT} from '../main/mainActions';
 let socket = null;
 
 const WS_PROTOCOL = document.location.protocol === 'https' ? 'wss:' : 'ws:';
-const WS_URL = window.WS_URL || `${WS_PROTOCOL}//${document.location.hostname}:${window.WS_PORT || 9600}/`;
+const WS_URL = window.WS_URL || `${WS_PROTOCOL}//${document.location.hostname}:${window.WS_PORT || 9600}`;
 
 export const wsClientMiddleware = store => next => action => {
   next(action);
@@ -32,11 +32,12 @@ export const wsClientMiddleware = store => next => action => {
       ws.onopen = () => {
         window.ws = socket = ws;
       }
+      ws.onmessage = (message) => {
+        console.info(JSON.parse(message.data));
+      }
     }
     default:
-      console.log('fallthru');
       if (socket && socket.readyState === WebSocket.OPEN) {
-        console.log(`sending ${action.type}`);
         socket.send(JSON.stringify(action));
       }
   }

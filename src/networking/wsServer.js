@@ -18,18 +18,17 @@ export const wsServerMiddleware = store => next => action => {
   next(action);
   switch (action.type) {
     case APP_INIT: {
-      console.log('app initting');
       const {app} = action;
       app.ws.use(function *(next) {
         const socketID = uuid.v1();
         const {websocket} = this;
         SOCKETS[socketID] = websocket;
-        store.dispatch(wsClientConnected(socketID));
         console.log('client connected!');
         websocket.on('message', (message, flags) => {
           store.dispatch(wsClientMessage(socketID, message, flags));
           try {
-            console.log(JSON.parse(message));
+            const clientAction = JSON.parse(message);
+            store.dispatch(clientAction);
           } catch (err) {
             console.error(err);
           }
@@ -37,6 +36,7 @@ export const wsServerMiddleware = store => next => action => {
         websocket.on('close', () => {
           store.dispatch(wsClientDisconnected(socketID));
         });
+        store.dispatch(wsClientConnected(socketID));
       });
       break;
     }
@@ -73,10 +73,19 @@ export const wsServerMiddleware = store => next => action => {
       }
       break;
     }
+    case WS_CLIENT_CONNECTED:
+    case WS_CLIENT_DISCONNECTED:
+    case WS_CLIENT_MESSAGE:
+      break;
     default: {
       const serializedAction = JSON.stringify(action);
-      Object.keys(SOCKETS).forEach(socket => {
-        socket.send(serializedAction);
+      Object.keys(SOCKETS).forEach(socketID => {
+        const socket = SOCKETS[socketID];
+        try {
+          socket.send(serializedAction);
+        } catch (err) {
+          console.error(err);
+        }
       });
     }
   }
