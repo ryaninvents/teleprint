@@ -35,6 +35,7 @@ export const wsServerMiddleware = store => next => action => {
         });
         websocket.on('close', () => {
           store.dispatch(wsClientDisconnected(socketID));
+          delete SOCKETS[socketID];
         });
         store.dispatch(wsClientConnected(socketID));
       });

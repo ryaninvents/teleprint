@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import {rgb, lighten} from 'color-ops';
 
+import './jog-pad.scss';
+
 const PADDING = 1;
 const CENTER = [50, 50];
 
@@ -67,8 +69,8 @@ class XYJogPad extends Component {
         flatten(RINGS.map(([r1, r2]) => ANGLES.map(a => (
                   <path key={[r1,r2,a].join(',')}
                         d={quarterCirclePath(a, r1, r2+0.15)}
-                        style={{cursor: 'pointer'}}
-                        fill={colorForAngleAndRadius(a, r2)} />
+                        fill={colorForAngleAndRadius(a, r2)} 
+                        className="jog-button" />
                   ))))
       }
     </g>);
@@ -91,7 +93,11 @@ class ZJog extends Component {
     return (<g>
       {
         flatten([1, -1].map(signum => [40, 28, 16].map(r => (
-          <rect x="110" y={50 + signum * r - 6} width="20" height="12" fill={colorForZ(signum, r)}/>
+          <rect x="110" 
+                y={50 + signum * r - 6}
+                width="20" height="12"
+                className="jog-button"
+                fill={colorForZ(signum, r)}/>
         ))))
       }
     </g>);
@@ -100,9 +106,11 @@ class ZJog extends Component {
 
 export default class JogPad extends Component {
   render() {
-    return (<svg viewBox="-1 -1 131 101">
-      <XYJogPad />
-      <ZJog />
-    </svg>);
+    return (<div className="jog-pad">
+      <svg viewBox="-1 -1 131 101">
+        <XYJogPad />
+        <ZJog />
+      </svg>
+    </div>);
   }
 }

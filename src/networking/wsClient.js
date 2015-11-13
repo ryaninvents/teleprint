@@ -1,3 +1,5 @@
+import uuid from 'node-uuid';
+
 export const WS_CONNECT              = ('teleprint/ws-client/connect');
 export const WS_CONNECT_SUCCESS      = ('teleprint/ws-client/connect/success');
 export const WS_CONNECT_FAILURE      = ('teleprint/ws-client/connect/failure');
@@ -12,6 +14,8 @@ export const WS_DISCONNECT           = ('teleprint/ws-client/disconnect');
 export const WS_DISCONNECT_SUCCESS   = ('teleprint/ws-client/disconnect/success');
 export const WS_DISCONNECT_FAILURE   = ('teleprint/ws-client/disconnect/failure');
 
+export const LOCAL_ACTION = Symbol('LOCAL_ACTION');
+
 import {APP_INIT} from '../main/mainActions';
 
 let socket = null;
@@ -19,6 +23,8 @@ let reconnectInterval = null;
 
 const WS_PROTOCOL = document.location.protocol === 'https' ? 'wss:' : 'ws:';
 const WS_URL = window.WS_URL || `${WS_PROTOCOL}//${document.location.hostname}:${window.WS_PORT || 9600}`;
+
+const clientID = uuid.v1();
 
 export const wsClientMiddleware = store => next => action => {
   next(action);
@@ -38,7 +44,10 @@ export const wsClientMiddleware = store => next => action => {
         store.dispatch(wsConnectSuccess());
       }
       ws.onmessage = (message) => {
-        console.info(JSON.parse(message.data));
+        const recvdAction = JSON.parse(message.data);
+        if (recvdAction.clientID !== clientID) {
+          store.dispatch(recvdAction);
+        }
       }
       ws.onerror = () => {
         if (ws.readyState === WebSocket.CLOSED) {
@@ -54,7 +63,14 @@ export const wsClientMiddleware = store => next => action => {
       }
     }
     default:
+      if (action[LOCAL_ACTION]) {
+        break;
+      }
       if (socket && socket.readyState === WebSocket.OPEN) {
+        action = {
+          ...action,
+          clientID,
+        };
         socket.send(JSON.stringify(action));
       }
   }

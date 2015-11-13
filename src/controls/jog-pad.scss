@@ -1,0 +1,19 @@
+.jog-pad {
+  position: relative;
+  .jog-button {
+    cursor: pointer;
+    opacity: 1.0;
+    transition: opacity 200ms;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+  .home-button {
+    position: absolute;
+    &.xy {
+      top: 50%;
+      left: 38.16%;
+      transform: translateX(-50%) translateY(-50%);
+    }
+  }
+}

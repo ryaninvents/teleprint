@@ -8,7 +8,7 @@ const classNameDescriptors = {
     return _.props.direction === 'vertical';
   },
   borderless(_) {
-    return _.props.borderless === 'true';
+    return _.props.borderless;
   },
   pointing(_) {
     return _.props.pointing;
