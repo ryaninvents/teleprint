@@ -26,20 +26,26 @@ export default class Dropdown extends Component {
   }
   render() {
     const {open} = this.state;
-    const selected = (this.selectedOption() || {}).name;
-    return (<div className={`ui dropdown active ${open ? 'visible' : 'hidden'}`} style={{minHeight: '1em'}}>
+    const selected = this.selectedOption();
+    const defaultText = this.props.defaultText || 'Select';
+    const onClick = () => this.setState({open: !open});
+    const title = selected ?
+      <div className="text">{selected.name}</div>:
+      <div className="default text">{defaultText}</div>;
+    return (<div className={`ui selection dropdown ${open ? 'active visible' : 'hidden'}`} onClick={onClick} style={{minHeight: '1em'}}>
       <input type="hidden"/>
-      <div className="text" onClick={() => this.setState({open:!open})}>
-        {selected}
-      </div>
+      {title}
       <i className="dropdown icon"/>
       <div className={`menu transition ${open ? 'visible' : 'hidden'}`} style={{
         display: open ? 'block' : 'none'
       }}>
         {
-          this.options().map(opt => (<div className={`${opt.name === selected ? 'active selected' : ''} item`} onClick={() => {
-            this.props.onChange(opt.value);
-            this.setState({open: false});
+          this.options().map(opt => (<div 
+                className={`${opt.name === selected ? 'active selected' : ''} item`} 
+                key={opt.value}
+                onClick={() => {
+                  this.props.onChange(opt.value);
+                  this.setState({open: false});
           }}>
             { opt.name }
           </div>))

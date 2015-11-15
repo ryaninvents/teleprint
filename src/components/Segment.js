@@ -4,7 +4,8 @@ import '../semantic/dist/components/segment.css';
 
 export default class Segment extends Component {
   render() {
-    return (<div className="ui segment">
+    const className = this.props.className || '';
+    return (<div className={`ui ${className} segment`}>
       {this.props.children}
     </div>);
   }

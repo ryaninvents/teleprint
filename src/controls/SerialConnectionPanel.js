@@ -32,52 +32,30 @@ class SerialConnectionPanel extends Component {
   }
   render() {
     const {loadingState} = this.props.serial;
-    return (<Segment>
-        <div className="ui form">
-          <div className="inline fields">
-            <div className="four wide field">
+    return (<div className="ui form">
+          <div className="two fields">
+            <div className="field">
               <label>Port</label>
-            </div>
-            <div className="twelve wide field">
               <Dropdown options={this.state.ports} selected={this.state.port}
                 onChange={(port) => this.setState({port})} />
             </div>
-          </div>
-          <div className="inline fields">
-            <button
-                className="fluid ui button"
-                onClick={() => this.handleSerialPortRefresh()}
-            >
-              <i className={this.loadingStateIconClass(loadingState)} />
-              Refresh ports list
-            </button>
-          </div>
-          <div className="inline fields">
-            <div className="four wide field">
+            <div className="field">
               <label>Baudrate</label>
-            </div>
-            <div className="twelve wide field">
-              <label>115200</label>
-            </div>
-          </div>
-          <div className="inline fields">
-            <div className="two ui buttons">
-              <button
-                  className="negative ui button"
-                  onClick={() => this.props.onCancel()}>
-                <i className="remove circle icon" />
-                Cancel
-              </button>
-              <button
-                  className="positive ui button"
-                  onClick={() => this.props.onSubmit()}>
-                <i className="plug icon" />
-                Connect
-              </button>
+              <Dropdown
+                  onChange={(baudrate) => this.setState({baudrate})}
+                  options={['9600','115200']}
+                  selected={this.state.baudrate}
+              />
             </div>
           </div>
-        </div>
-      </Segment>);
+          <button
+              className="fluid ui button"
+              onClick={() => this.handleSerialPortRefresh()}
+          >
+            <i className={this.loadingStateIconClass(loadingState)} />
+            Refresh ports list
+          </button>
+        </div>);
   }
 }
 
