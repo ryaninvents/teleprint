@@ -1,11 +1,10 @@
 # teleprint
 
-> Another boilerplate for personal usage
-
-Extend [counter examples](https://github.com/rackt/redux/tree/master/examples/counter) with [react-router](). And use [chai](https://github.com/chaijs/chai) and [sinon](https://github.com/cjohansen/Sinon.JS/) instand of [expect](https://github.com/mjackson/expect).
-
+3D print host software.
 
 ## Start
+
+Tested on NodeJS 5.0, but may work on different versions.
 
 ```sh
 npm start
@@ -17,9 +16,6 @@ npm start
 npm test
 ```
 
-note: jsdom >= v4.0 only work on io.js
-
-
 ## License
 
-MIT © [Ryan Muller](http://r24y.com)
+BSD 3-Clause
